@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Red Médica</title>
+  <link rel="stylesheet" href="login.css">
+</head>
+<body>
+  <div class="container">
+    <div class="login-box">
+      <h2 id="titulo">Iniciar Sesión</h2>
+
+      <!-- FORMULARIO DE LOGIN -->
+      <form id="login-form" class="form active">
+        <input type="text" placeholder="Usuario o correo" required>
+        <input type="password" placeholder="Contraseña" required>
+        <button type="submit">Entrar</button>
+        <p class="toggle">¿No tienes cuenta? <a href="#" id="show-register">Regístrate</a></p>
+      </form>
+
+      <!-- FORMULARIO DE REGISTRO -->
+      <form id="register-form" class="form">
+        <input type="text" placeholder="Nombre(s)" required>
+        <input type="text" placeholder="Apellidos" required>
+        <input type="email" placeholder="Correo electrónico" required>
+        <input type="tel" placeholder="Numero de Telefono" required>
+        <input type="password" placeholder="Contraseña" required>
+        <input type="password" placeholder="Confirmar contraseña" required>
+        <button type="submit">Registrarse</button>
+        <p class="toggle">¿Ya tienes cuenta? <a href="#" id="show-login">Inicia sesión</a></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>

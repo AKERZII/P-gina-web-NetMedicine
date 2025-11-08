@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Red Médica (Inicio)</title>
+  <link rel="stylesheet" href="Principal.css">
+</head>
+<body>
+
+  <!-- ENCABEZADO SUPERIOR -->
+  <header class="top-header">
+    <div class="logo">
+      <img src="Logo.jpg" alt="">
+    </div>
+
+    <div class="contacto">
+      <p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p>
+    </div>
+
+<div class="login" id="loginArea">
+  <a href="login.html" class="btn-login" id="loginBtn">Iniciar Sesión</a>
+</div>
+
+<script>
+  const usuarioActual = localStorage.getItem("usuarioActual");
+  if (usuarioActual) {
+    document.getElementById("loginArea").innerHTML = `
+      <p> Bienvenido, <strong>${usuarioActual}</strong></p>
+      <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>
+    `;
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("usuarioActual");
+      window.location.reload();
+    });
+  }
+</script>
+
+
+  </header>
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <nav class="navbar">
+    <ul class="menu">
+      <li><a href="Medicos.html">Médicos</a></li>
+      <li><a href="Agenda.html">Agenda</a></li>
+      <li class="dropdown">
+        <a href="">Servicios ▾</a>
+        <ul class="submenu">
+          <li><a href="#">Consultas</a></li>
+          <li><a href="#">Hospitalización</a></li>
+          <li><a href="#">Laboratorio Clínico</a></li>
+          <li><a href="#">Rehabilitación</a></li>
+          <li><a href="#">Salud Mental</a></li>
+          <li><a href="#">Farmacia</a></li>
+          <li><a href="#">Urgencias</a></li>
+          <li><a href="#">Planificación Familiar</a></li>
+        </ul>
+      </li>
+      <li><a href="Reportes.html">Reportes</a></li>
+    </ul>
+  </nav>
+
+  <!-- SECCIÓN DE SLIDER -->
+  <section class="hero">
+    <div class="slider">
+      <div class="slides">
+        <img src="images.jpg" alt="">
+        <img src="post_WhatsApp_Image_2023-03-12_at_10.06.19_AM__1_.jpeg" alt="">
+        <img src="0_Fachada-HAMexico.jpg" alt="">
+      </div>
+      <h1 class="titulo-hero">Red Médica</h1>
+    </div>
+  </section>
+
+</body>
+</html>
+
+

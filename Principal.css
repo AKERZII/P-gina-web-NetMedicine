@@ -1,0 +1,144 @@
+/* --- ESTILOS GENERALES --- */
+body {
+  margin: 0;
+  font-family: 'Times New Roman', serif;
+  background-color: #f0f4f7;
+  overflow-x: hidden;
+}
+
+/* --- ENCABEZADO SUPERIOR --- */
+.top-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #ffffff, #d8e2ec);
+  padding: 10px 50px;
+  border-bottom: 2px solid #c0c0c0;
+}
+
+.logo img {
+  height: 90px;
+}
+
+.contacto p {
+  margin: 0;
+  color: #2e3a44;
+  font-size: 15px;
+}
+
+.btn-login {
+  background-color: #4c7ea6;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.btn-login:hover {
+  background-color: #365b7d;
+}
+
+/* --- MENÚ DE NAVEGACIÓN --- */
+.navbar {
+  background-color: #4c7ea6;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+}
+
+.menu li {
+  position: relative;
+}
+
+.menu a {
+  display: block;
+  color: white;
+  text-decoration: none;
+  padding: 15px 25px;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.menu a:hover {
+  background-color: #365b7d;
+}
+
+/* --- SUBMENÚ (dropdown) --- */
+.submenu {
+  display: none;
+  position: absolute;
+  background-color: #4c7ea6;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 200px;
+  top: 100%;
+  left: 0;
+  border-radius: 0 0 8px 8px;
+}
+
+.submenu li a {
+  padding: 12px 20px;
+  display: block;
+  color: white;
+  text-decoration: none;
+  text-align: left;
+}
+
+.submenu li a:hover {
+  background-color: #365b7d;
+}
+
+.dropdown:hover .submenu {
+  display: block;
+}
+
+/* --- SLIDER --- */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+}
+
+.slides {
+  display: flex;
+  width: 300%;
+  animation: slide 15s infinite;
+}
+
+.slides img {
+  width: 100%;
+  height: 500px;
+  object-fit: cover;
+}
+
+/* --- TÍTULO SOBRE EL SLIDER --- */
+.titulo-hero {
+  position: absolute;
+  top: 50%;
+  left: 50px;
+  transform: translateY(-50%);
+  font-size: 50px;
+  color: white;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+}
+
+/* --- ANIMACIÓN SLIDER --- */
+@keyframes slide {
+  0% { transform: translateX(0); }
+  30% { transform: translateX(0); }
+  35% { transform: translateX(-100%); }
+  65% { transform: translateX(-100%); }
+  70% { transform: translateX(-200%); }
+  100% { transform: translateX(-200%); }
+}
