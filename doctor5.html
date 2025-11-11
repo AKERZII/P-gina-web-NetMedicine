@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dr. Roberto Hernández | Red Médica</title>
+  <link rel="stylesheet" href="Principal.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f6f9;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .perfil-container {
+      max-width: 900px;
+      margin: 50px auto;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      padding: 30px;
+    }
+
+    .perfil-img {
+      width: 100%;
+      max-width: 300px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      object-position: center top;
+      border-radius: 8px;
+      background-color: #e9ecef;
+    }
+
+    .btn-agendar {
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 50px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 20px;
+    }
+
+    .btn-agendar:hover {
+      background-color: #0056b3;
+    }
+
+    h2 {
+      color: #2c3e50;
+      font-weight: 600;
+    }
+
+    p {
+      color: #555;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ENCABEZADO SUPERIOR -->
+  <header class="top-header">
+    <div class="logo">
+      <img src="Logo.jpg" alt="Logo Red Médica">
+    </div>
+    <div class="contacto">
+      <p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p>
+    </div>
+    <div class="login" id="loginArea">
+      <a href="login.html" class="btn-login" id="loginBtn">Iniciar Sesión</a>
+    </div>
+    <script>
+      const usuarioActual = localStorage.getItem("usuarioActual");
+      if (usuarioActual) {
+        document.getElementById("loginArea").innerHTML = `
+          <p> Bienvenido, <strong>${usuarioActual}</strong></p>
+          <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>
+        `;
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+          localStorage.removeItem("usuarioActual");
+          window.location.reload();
+        });
+      }
+    </script>
+  </header>
+
+  <!-- BARRA DE NAVEGACIÓN -->
+  <nav class="navbar">
+    <ul class="menu">
+      <li><a href="Principal.html">Inicio</a></li>
+      <li><a href="Medicos.html">Médicos</a></li>
+      <li><a href="Agenda.html">Agenda</a></li>
+      <li class="dropdown">
+        <a href="#">Servicios ▾</a>
+        <ul class="submenu">
+          <li><a href="#">Consultas</a></li>
+          <li><a href="#">Hospitalización</a></li>
+          <li><a href="#">Laboratorio Clínico</a></li>
+          <li><a href="#">Rehabilitación</a></li>
+          <li><a href="#">Salud Mental</a></li>
+          <li><a href="#">Farmacia</a></li>
+          <li><a href="#">Urgencias</a></li>
+          <li><a href="#">Planificación Familiar</a></li>
+        </ul>
+      </li>
+      <li><a href="Reportes.html">Reportes</a></li>
+    </ul>
+  </nav>
+
+  <!-- PERFIL DEL MÉDICO -->
+  <div class="perfil-container text-center">
+    <img src="doctor5.jpg" alt="Dr. Roberto Hernández" class="perfil-img mb-4">
+    <h2>Dr. Roberto Hernández</h2>
+    <p><strong>Especialidad:</strong> Medicina Interna</p>
+    <p><strong>Hospital:</strong> Hospital General de Occidente</p>
+    <p><strong>Experiencia:</strong> Diagnóstico y tratamiento de enfermedades internas complejas.</p>
+    <p><strong>Formación:</strong> Universidad de Guadalajara, especialidad en Medicina Interna en el Hospital General de Occidente.</p>
+    <p><strong>Idiomas:</strong> Español</p>
+    <p><strong>Horario de atención:</strong> Lunes a Viernes de 10:00 a 16:00 hrs</p>
+    <a href="Agenda.html" class="btn-agendar">Agendar cita</a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

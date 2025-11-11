@@ -132,7 +132,66 @@ body {
   color: white;
   text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
 }
+body {
+      background-color: #f4f6f9;
+      font-family: 'Segoe UI', sans-serif;
+    }
 
+    h1 {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .card {
+      border: none;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease;
+      background-color: #fff;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-img-top {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      object-position: center top;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+    }
+
+    .card-body {
+      padding: 1.2rem;
+      min-height: 200px;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #34495e;
+    }
+
+    .card-text {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .btn-learn {
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 50px;
+      padding: 0.4rem 1.2rem;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-learn:hover {
+      background-color: #0056b3;
+    }
 /* --- ANIMACIÓN SLIDER --- */
 @keyframes slide {
   0% { transform: translateX(0); }
