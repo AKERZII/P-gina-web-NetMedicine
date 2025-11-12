@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Login - Red Médica</title>
+  <!-- Bootstrap CSS for validation classes (no layout grid used) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="login.css">
 </head>
 <body>
@@ -10,25 +12,59 @@
     <div class="login-box">
       <h2 id="titulo">Iniciar Sesión</h2>
 
-      <!-- FORMULARIO DE LOGIN -->
-      <form id="login-form" class="form active">
-        <input type="text" placeholder="Usuario o correo" required>
-        <input type="password" placeholder="Contraseña" required>
+      <!-- LOGIN -->
+      <form id="login-form" class="form active needs-validation" novalidate>
+        <div class="mb-2">
+          <input type="text" id="login-user" class="form-control" placeholder="Usuario" required>
+          <div class="valid-feedback"></div>
+          <div class="invalid-feedback">Ingresa tu usuario.</div>
+        </div>
+        <div class="mb-2">
+          <input type="password" id="login-pass" class="form-control" placeholder="Contraseña" required>
+          <div class="valid-feedback"></div>
+          <div class="invalid-feedback">Ingresa tu contraseña.</div>
+        </div>
         <button type="submit">Entrar</button>
         <p class="toggle">¿No tienes cuenta? <a href="#" id="show-register">Regístrate</a></p>
       </form>
 
-      <!-- FORMULARIO DE REGISTRO -->
-      <form id="register-form" class="form">
-        <input type="text" placeholder="Nombre(s)" required>
-        <input type="text" placeholder="Apellidos" required>
-        <input type="email" placeholder="Correo electrónico" required>
-        <input type="tel" placeholder="Numero de Telefono" required>
-        <input type="password" placeholder="Contraseña" required>
-        <input type="password" placeholder="Confirmar contraseña" required>
+      <!-- REGISTRO -->
+      <form id="register-form" class="form needs-validation" novalidate>
+        <div class="mb-2">
+          <input type="text" id="reg-nombre" class="form-control" placeholder="Nombre(s)" required>
+          <div class="valid-feedback"></div>
+          <div class="invalid-feedback">Ingresa tu nombre.</div>
+        </div>
+        <div class="mb-2">
+          <input type="text" id="reg-apellido" class="form-control" placeholder="Apellidos" required>
+          <div class="valid-feedback"></div>
+          <div class="invalid-feedback">Ingresa tus apellidos.</div>
+        </div>
+        <div class="mb-2">
+          <input type="email" id="reg-correo" class="form-control" placeholder="Correo electrónico" required>
+          <div class="valid-feedback"></div>
+          <div class="invalid-feedback">Ingresa un correo válido.</div>
+        </div>
+        <div class="mb-2">
+          <input type="tel" id="reg-telefono" class="form-control" placeholder="Número de Teléfono" required>
+          <div class="valid-feedback"></div>
+          <div class="invalid-feedback">Ingresa un número válido.</div>
+        </div>
+        <div class="mb-2">
+          <input type="password" id="reg-pass" class="form-control" placeholder="Contraseña" required>
+          <div class="valid-feedback"></div>
+          <div class="invalid-feedback">Ingresa una contraseña.</div>
+        </div>
+        <div class="mb-2">
+          <input type="password" id="reg-confirm" class="form-control" placeholder="Confirmar contraseña" required>
+          <div class="valid-feedback"></div>
+          <div class="invalid-feedback">Confirma tu contraseña.</div>
+        </div>
         <button type="submit">Registrarse</button>
         <p class="toggle">¿Ya tienes cuenta? <a href="#" id="show-login">Inicia sesión</a></p>
       </form>
+
+      <p class="mensaje" id="mensaje"></p>
     </div>
   </div>
 

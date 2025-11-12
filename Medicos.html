@@ -6,264 +6,266 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="Principal.css">
   <style>
-    body {
-      background-color: #f4f6f9;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
-    h1 {
-      font-weight: 600;
-      color: #2c3e50;
-    }
-
-    .card {
-      border: none;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      transition: transform 0.3s ease;
-      background-color: #fff;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
-    }
-
-    .card-img-top {
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      object-fit: cover;
-      object-position: center top;
-      border-radius: 8px;
-      background-color: #f8f9fa;
-    }
-
-    .card-body {
-      padding: 1.2rem;
-      min-height: 200px;
-    }
-
-    .card-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #34495e;
-    }
-
-    .card-text {
-      font-size: 0.95rem;
-      color: #555;
-    }
-
-    .btn-learn {
-      background-color: #007bff;
-      color: #fff;
-      border-radius: 50px;
-      padding: 0.4rem 1.2rem;
-      font-size: 0.9rem;
-      transition: background-color 0.3s ease;
-    }
-
-    .btn-learn:hover {
-      background-color: #0056b3;
-    }
+    body { animation: fadeInPage 0.8s ease-in-out; }
+    @keyframes fadeInPage { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+    .btn-learn { background-color:#0d6efd; color:#fff; border-radius:50px; padding:8px 16px; text-decoration:none; }
+    .btn-learn:hover { background-color:#0b5ed7; color:#fff; }
+    .card-img-top { aspect-ratio: 4 / 3; object-fit: cover; object-position: center; background:#e9ecef; }
+    .admin-toolbar { display:flex; gap:10px; justify-content:flex-end; margin-bottom:20px; }
   </style>
 </head>
 <body>
-    <header class="top-header">
-    <div class="logo">
-      <img src="Logo.jpg" alt="">
-    </div>
-
-    <div class="contacto">
-      <p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p>
-    </div>
-
-<div class="login" id="loginArea">
-  <a href="login.html" class="btn-login" id="loginBtn">Iniciar Sesión</a>
-</div>
-
-<script>
-  const usuarioActual = localStorage.getItem("usuarioActual");
-  if (usuarioActual) {
-    document.getElementById("loginArea").innerHTML = `
-      <p> Bienvenido, <strong>${usuarioActual}</strong></p>
-      <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>
-    `;
-    document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.removeItem("usuarioActual");
-      window.location.reload();
-    });
-  }
-</script>
-
-
+  <!-- ENCABEZADO -->
+  <header class="top-header">
+    <div class="logo"><img src="Logo.jpg" alt="Logo"></div>
+    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
+    <div class="login" id="loginArea"><a href="login.html" class="btn-login">Iniciar Sesión</a></div>
+    <script>
+      const usuarioActual = localStorage.getItem("usuarioActual");
+      const rol = localStorage.getItem("rolUsuario");
+      if (usuarioActual) {
+        document.getElementById("loginArea").innerHTML = `
+          <p>Bienvenido, <strong>${usuarioActual}</strong> (${rol || 'sin rol'})</p>
+          <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>`;
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+          localStorage.removeItem("usuarioActual"); localStorage.removeItem("rolUsuario"); window.location.reload();
+        });
+      }
+    </script>
   </header>
 
-  <!-- BARRA DE NAVEGACIÓN -->
+  <!-- NAVBAR -->
   <nav class="navbar">
     <ul class="menu">
-        <li><a href="Principal.html">Inicio</a></li>
+      <li><a href="Principal.html">Inicio</a></li>
       <li><a href="Medicos.html">Médicos</a></li>
       <li><a href="Agenda.html">Agenda</a></li>
-      <li class="dropdown">
-        <a href="">Servicios ▾</a>
-        <ul class="submenu">
-          <li><a href="#">Consultas</a></li>
-          <li><a href="#">Hospitalización</a></li>
-          <li><a href="#">Laboratorio Clínico</a></li>
-          <li><a href="#">Rehabilitación</a></li>
-          <li><a href="#">Salud Mental</a></li>
-          <li><a href="#">Farmacia</a></li>
-          <li><a href="#">Urgencias</a></li>
-          <li><a href="#">Planificación Familiar</a></li>
-        </ul>
-      </li>
+      <li><a href="Consultas.html">Consultas</a></li>
       <li><a href="Reportes.html">Reportes</a></li>
     </ul>
   </nav>
 
+  <!-- CONTENIDO -->
   <div class="container py-5">
-    <h1 class="text-center mb-5">Directorio Médico</h1>
-    <div class="row row-cols-1 row-cols-md-3 g-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h1 class="mb-0">Directorio Médico</h1>
+      <div class="admin-toolbar">
+        <button id="btnAgregar" class="btn btn-primary btn-admin">Agregar médico</button>
+      </div>
+    </div>
 
-      <!-- Médico 1 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="doctor1.jpg" class="card-img-top" alt="Dr. Juan García">
-          <div class="card-body">
-            <h5 class="card-title">Dr. Juan García</h5>
-            <p class="card-text"><strong>Cardiología</strong></p>
-            <p class="card-text">Especialista en enfermedades cardiovasculares y prevención de enfermedades del corazón.</p>
-          </div>
-          <div class="card-footer bg-white text-center">
-            <a href="doctor1.html" class="btn btn-learn">Aprender más</a>
-          </div>
+    <div id="gridMedicos" class="row row-cols-1 row-cols-md-3 g-4"></div>
+  </div>
+
+  <!-- MODAL AGREGAR/EDITAR -->
+  <div class="modal fade" id="medicoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content" style="border-radius:12px;">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Agregar médico</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <form id="formMedico" class="needs-validation" novalidate>
+            <input type="hidden" id="medicoId">
+            <div class="mb-3">
+              <label class="form-label">Nombre mostrado</label>
+              <input type="text" id="nombre" class="form-control" placeholder="Dr. Juan García" required>
+              <div class="invalid-feedback">Ingresa el nombre.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Especialidad</label>
+              <input type="text" id="especialidad" class="form-control" placeholder="Cardiología" required>
+              <div class="invalid-feedback">Ingresa la especialidad.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Descripción breve</label>
+              <input type="text" id="descripcion" class="form-control" placeholder="Resumen corto" required>
+              <div class="invalid-feedback">Ingresa la descripción.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Archivo de imagen</label>
+              <input type="text" id="imagen" class="form-control" placeholder="doctor1.jpg" required>
+              <div class="invalid-feedback">Ingresa el nombre del archivo de imagen.</div>
+              <small class="text-muted">Usa archivos locales existentes (p.ej., doctor1.jpg, doctora2.jpg).</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Perfil HTML</label>
+              <input type="text" id="perfil" class="form-control" placeholder="doctor1.html" required>
+              <div class="invalid-feedback">Ingresa el archivo de perfil.</div>
+              <small class="text-muted">Debe existir el archivo de perfil correspondiente.</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Horario inicio</label>
+              <input type="time" id="inicio" class="form-control" required>
+              <div class="invalid-feedback">Ingresa hora de inicio.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Horario fin</label>
+              <input type="time" id="fin" class="form-control" required>
+              <div class="invalid-feedback">Ingresa hora de fin.</div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Guardar</button>
+          </form>
         </div>
       </div>
-
-      <!-- Médico 2 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="doctora1.jpg" class="card-img-top" alt="Dra. María López">
-          <div class="card-body">
-            <h5 class="card-title">Dra. María López</h5>
-            <p class="card-text"><strong>Pediatría</strong></p>
-            <p class="card-text">Atención médica integral para niños y adolescentes.</p>
-          </div>
-          <div class="card-footer bg-white text-center">
-            <a href="doctora1.html" class="btn btn-learn">Aprender más</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Médico 3 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="doctor2.jpg" class="card-img-top" alt="Dr. Luis Ramírez">
-          <div class="card-body">
-            <h5 class="card-title">Dr. Luis Ramírez</h5>
-            <p class="card-text"><strong>Neumología</strong></p>
-            <p class="card-text">Diagnóstico y tratamiento de enfermedades respiratorias y pulmonares.</p>
-          </div>
-          <div class="card-footer bg-white text-center">
-            <a href="doctor2.html" class="btn btn-learn">Aprender más</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Médico 4 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="doctora2.jpg" class="card-img-top" alt="Dra. Ana Fernández">
-          <div class="card-body">
-            <h5 class="card-title">Dra. Ana Fernández</h5>
-            <p class="card-text"><strong>Dermatología</strong></p>
-            <p class="card-text">Tratamiento de enfermedades de la piel, cabello y uñas.</p>
-          </div>
-          <div class="card-footer bg-white text-center">
-            <a href="doctora2.html" class="btn btn-learn">Aprender más</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Médico 5 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="doctor3.jpg" class="card-img-top" alt="Dr. Carlos Martínez">
-          <div class="card-body">
-            <h5 class="card-title">Dr. Carlos Martínez</h5>
-            <p class="card-text"><strong>Medicina General</strong></p>
-            <p class="card-text">Atención médica primaria y seguimiento de enfermedades crónicas.</p>
-          </div>
-          <div class="card-footer bg-white text-center">
-            <a href="doctor3.html" class="btn btn-learn">Aprender más</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Médico 6 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="doctora3.jpg" class="card-img-top" alt="Dra. Elena Rivas">
-          <div class="card-body">
-            <h5 class="card-title">Dra. Elena Rivas</h5>
-            <p class="card-text"><strong>Ginecología</strong></p>
-            <p class="card-text">Atención integral a la salud femenina.</p>
-          </div>
-          <div class="card-footer bg-white text-center">
-            <a href="doctora3.html" class="btn btn-learn">Aprender más</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Médico 7 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="doctor4.jpg" class="card-img-top" alt="Dr. Miguel Torres">
-          <div class="card-body">
-            <h5 class="card-title">Dr. Miguel Torres</h5>
-            <p class="card-text"><strong>Psicología</strong></p>
-            <p class="card-text">Apoyo psicológico y tratamiento de trastornos emocionales.</p>
-          </div>
-          <div class="card-footer bg-white text-center">
-            <a href="doctor4.html" class="btn btn-learn">Aprender más</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Médico 8 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="doctora4.jpg" class="card-img-top" alt="Dra. Laura Navarro">
-          <div class="card-body">
-            <h5 class="card-title">Dra. Laura Navarro</h5>
-            <p class="card-text"><strong>Endocrinología</strong></p>
-            <p class="card-text">Diagnóstico y tratamiento de enfermedades hormonales y metabólicas.</p>
-          </div>
-          <div class="card-footer bg-white text-center">
-            <a href="doctora4.html" class="btn btn-learn">Aprender más</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Médico 9 -->
-      <div class="col">
-        <div class="card h-100">
-          <img src="doctor5.jpg" class="card-img-top" alt="Dr. Roberto Hernández">
-          <div class="card-body">
-            <h5 class="card-title">Dr. Roberto Hernández</h5>
-            <p class="card-text"><strong>Medicina Interna</strong></p>
-            <p class="card-text">Diagnóstico y tratamiento de enfermedades internas complejas.</p>
-          </div>
-          <div class="card-footer bg-white text-center">
-            <a href="doctor5.html" class="btn btn-learn">Aprender más</a>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Ocultar controles admin si el rol no es administrador
+    (function gateByRole(){
+      const rol = localStorage.getItem("rolUsuario");
+      if (rol !== "admin") {
+        document.querySelectorAll(".btn-admin").forEach(btn => btn.style.display = "none");
+      }
+    })();
+
+    // Datos iniciales (seed) si no existe localStorage.medicos
+    const seedMedicos = [
+      { id: cryptoRandomId(), nombre:"Dr. Juan García", especialidad:"Cardiología", descripcion:"Especialista en enfermedades cardiovasculares y prevención.", imagen:"doctor1.jpg", perfil:"doctor1.html", inicio:"09:00", fin:"14:00" },
+      { id: cryptoRandomId(), nombre:"Dra. María López", especialidad:"Pediatría", descripcion:"Atención integral para niños y adolescentes.", imagen:"doctora1.jpg", perfil:"doctora1.html", inicio:"10:00", fin:"16:00" },
+      { id: cryptoRandomId(), nombre:"Dr. Luis Ramírez", especialidad:"Neumología", descripcion:"Enfermedades respiratorias y pulmonares.", imagen:"doctor2.jpg", perfil:"doctor2.html", inicio:"09:00", fin:"13:00" },
+      { id: cryptoRandomId(), nombre:"Dra. Ana Fernández", especialidad:"Dermatología", descripcion:"Piel, cabello y uñas.", imagen:"doctora2.jpg", perfil:"doctora2.html", inicio:"11:00", fin:"17:00" },
+      { id: cryptoRandomId(), nombre:"Dr. Carlos Martínez", especialidad:"Medicina General", descripcion:"Atención primaria y seguimiento clínico.", imagen:"doctor3.jpg", perfil:"doctor3.html", inicio:"08:00", fin:"14:00" },
+      { id: cryptoRandomId(), nombre:"Dra. Elena Rivas", especialidad:"Ginecología", descripcion:"Salud femenina y planificación familiar.", imagen:"doctora3.jpg", perfil:"doctora3.html", inicio:"10:00", fin:"15:00" },
+      { id: cryptoRandomId(), nombre:"Dr. Miguel Torres", especialidad:"Psicología", descripcion:"Terapia cognitivo-conductual y apoyo emocional.", imagen:"doctor4.jpg", perfil:"doctor4.html", inicio:"12:00", fin:"18:00" },
+      { id: cryptoRandomId(), nombre:"Dra. Laura Navarro", especialidad:"Endocrinología", descripcion:"Trastornos hormonales y metabólicos.", imagen:"doctora4.jpg", perfil:"doctora4.html", inicio:"09:00", fin:"13:00" },
+      { id: cryptoRandomId(), nombre:"Dr. Roberto Hernández", especialidad:"Medicina Interna", descripcion:"Diagnóstico y manejo de enfermedades complejas.", imagen:"doctor5.jpg", perfil:"doctor5.html", inicio:"10:00", fin:"16:00" }
+    ];
+
+    function cryptoRandomId(){
+      return 'm_' + Math.random().toString(36).slice(2,10);
+    }
+
+    function getMedicos(){
+      let medicos = JSON.parse(localStorage.getItem("medicos"));
+      if (!medicos || !Array.isArray(medicos) || medicos.length === 0) {
+        localStorage.setItem("medicos", JSON.stringify(seedMedicos));
+        medicos = seedMedicos;
+      }
+      return medicos;
+    }
+
+    function setMedicos(medicos){
+      localStorage.setItem("medicos", JSON.stringify(medicos));
+    }
+
+    function renderGrid(){
+      const rol = localStorage.getItem("rolUsuario");
+      const cont = document.getElementById("gridMedicos");
+      const medicos = getMedicos();
+      cont.innerHTML = medicos.map(m => `
+        <div class="col">
+          <div class="card h-100">
+            <img src="${m.imagen}" class="card-img-top" alt="${m.nombre}">
+            <div class="card-body">
+              <h5 class="card-title">${m.nombre}</h5>
+              <p class="card-text"><strong>${m.especialidad}</strong></p>
+              <p class="card-text">${m.descripcion}</p>
+              <p class="card-text text-muted">Horario: ${m.inicio}–${m.fin}</p>
+            </div>
+            <div class="card-footer bg-white text-center">
+              <a href="${m.perfil}" class="btn btn-learn">Perfil</a>
+              <button class="btn btn-warning btn-admin" data-action="edit" data-id="${m.id}" ${rol!=='admin'?'style="display:none"':''}>Editar</button>
+              <button class="btn btn-danger btn-admin" data-action="delete" data-id="${m.id}" ${rol!=='admin'?'style="display:none"':''}>Eliminar</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Bind admin actions
+      cont.querySelectorAll("button.btn-admin").forEach(btn=>{
+        btn.addEventListener("click", onAdminAction);
+      });
+    }
+
+    function onAdminAction(e){
+      const btn = e.currentTarget;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      const medicos = getMedicos();
+      const item = medicos.find(m=>m.id===id);
+      if (!item) return;
+
+      if (action === "edit") {
+        openModal(item);
+      } else if (action === "delete") {
+        if (confirm(`¿Eliminar a ${item.nombre}?`)) {
+          const updated = medicos.filter(m=>m.id!==id);
+          setMedicos(updated);
+          renderGrid();
+          alert("Médico eliminado.");
+        }
+      }
+    }
+
+    // Modal helpers
+    const modalEl = document.getElementById('medicoModal');
+    const modal = new bootstrap.Modal(modalEl);
+    const form = document.getElementById('formMedico');
+
+    document.getElementById("btnAgregar")?.addEventListener("click", ()=>{
+      openModal(null);
+    });
+
+    function openModal(item){
+      document.getElementById('modalTitle').textContent = item ? 'Editar médico' : 'Agregar médico';
+      document.getElementById('medicoId').value = item?.id || '';
+      document.getElementById('nombre').value = item?.nombre || '';
+      document.getElementById('especialidad').value = item?.especialidad || '';
+      document.getElementById('descripcion').value = item?.descripcion || '';
+      document.getElementById('imagen').value = item?.imagen || '';
+      document.getElementById('perfil').value = item?.perfil || '';
+      document.getElementById('inicio').value = item?.inicio || '';
+      document.getElementById('fin').value = item?.fin || '';
+      form.classList.remove('was-validated');
+      modal.show();
+    }
+
+    form.addEventListener('submit', function(event){
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+        form.classList.add('was-validated');
+        return;
+      }
+      event.preventDefault();
+
+      const medicos = getMedicos();
+      const payload = {
+        id: document.getElementById('medicoId').value || cryptoRandomId(),
+        nombre: document.getElementById('nombre').value.trim(),
+        especialidad: document.getElementById('especialidad').value.trim(),
+        descripcion: document.getElementById('descripcion').value.trim(),
+        imagen: document.getElementById('imagen').value.trim(),
+        perfil: document.getElementById('perfil').value.trim(),
+        inicio: document.getElementById('inicio').value,
+        fin: document.getElementById('fin').value
+      };
+
+      // Simple horario sanity check
+      if (payload.fin < payload.inicio) {
+        alert("El horario fin no puede ser menor que el inicio.");
+        return;
+      }
+
+      const existingIndex = medicos.findIndex(m=>m.id===payload.id);
+      if (existingIndex >= 0) {
+        medicos[existingIndex] = payload;
+      } else {
+        medicos.push(payload);
+      }
+      setMedicos(medicos);
+      modal.hide();
+      renderGrid();
+      alert("Datos guardados.");
+    });
+
+    // Inicializar
+    renderGrid();
+  </script>
 </body>
 </html>

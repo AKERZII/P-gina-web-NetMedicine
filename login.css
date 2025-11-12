@@ -3,7 +3,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', 'Times New Roman', serif;
-  background-image: url('WhatsApp\ Image\ 2025-11-03\ at\ 10.17.11_bcb63817.jpg'); /* Tu imagen */
+  background-image: url('WhatsApp Image 2025-11-03 at 10.17.11_bcb63817.jpg'); /* Tu imagen */
   background-size: cover;
   background-position: center;
   height: 100vh;
@@ -16,28 +16,25 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Centra verticalmente el contenido */
-  align-items: center;     /* Centra horizontalmente */
-  gap: 15px; /* Espaciado uniforme entre los elementos */
-
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
   backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
   padding: 40px 50px;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   text-align: center;
   width: 350px;
-  height: 500px;
+  height: auto;
   transition: all 0.3s ease;
 }
-
-
 
 /* Título */
 h2 {
   color: #1b3a57;
-  margin-bottom: 40px;
-  font-size: 40px;  /* Aumenta o reduce este valor según prefieras */
+  margin-bottom: 25px;
+  font-size: 32px;
   font-weight: bold;
 }
 
@@ -45,7 +42,7 @@ h2 {
 input {
   width: 100%;
   padding: 10px;
-  margin: 10px 0;
+  margin: 8px 0;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 14px;
@@ -96,12 +93,5 @@ button:hover {
   display: block;
   opacity: 1;
   transform: scale(1);
-}
-
-/* Mensaje de validación */
-.mensaje {
-  font-size: 14px;
-  margin-top: 8px;
-  text-align: center;
 }
 
