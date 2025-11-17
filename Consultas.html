@@ -63,6 +63,9 @@
           <th>Hora</th>
           <th>Correo</th>
           <th>Fecha</th>
+          <th>Título</th>
+          <th>Descripción</th>
+          <th>Tipo</th>
         </tr>
       </thead>
       <tbody id="listaCitas"></tbody>
@@ -73,7 +76,7 @@
     const citas = JSON.parse(localStorage.getItem("citas")) || [];
     const lista = document.getElementById("listaCitas");
     if (citas.length === 0) {
-      lista.innerHTML = `<tr><td colspan="5" class="text-center">No hay citas registradas</td></tr>`;
+      lista.innerHTML = `<tr><td colspan="8" class="text-center">No hay citas registradas</td></tr>`;
     } else {
       lista.innerHTML = citas.map(cita => `
         <tr>
@@ -82,6 +85,9 @@
           <td>${cita.hora}</td>
           <td>${cita.correo}</td>
           <td>${cita.fecha}</td>
+          <td>${cita.titulo || ''}</td>
+          <td>${cita.descripcion || ''}</td>
+          <td>${cita.tipo || ''}</td>
         </tr>
       `).join('');
     }

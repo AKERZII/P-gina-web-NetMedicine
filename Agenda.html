@@ -106,6 +106,27 @@
               <input type="email" id="correoInput" class="form-control" required>
               <div class="invalid-feedback">Ingresa un correo válido.</div>
             </div>
+            <!-- NUEVOS CAMPOS -->
+            <div class="mb-3">
+              <label class="form-label">Título</label>
+              <input type="text" id="tituloInput" class="form-control" required>
+              <div class="invalid-feedback">Ingresa un título para la cita.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Descripción</label>
+              <textarea id="descripcionInput" class="form-control" rows="3" required></textarea>
+              <div class="invalid-feedback">Agrega una breve descripción.</div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Tipo</label>
+              <select id="tipoSelect" class="form-select" required>
+                <option value="">Selecciona...</option>
+                <option>Consulta</option>
+                <option>Examen</option>
+                <option>Urgencia</option>
+              </select>
+              <div class="invalid-feedback">Selecciona el tipo de cita.</div>
+            </div>
             <button type="submit" class="btn btn-primary w-100">Confirmar cita</button>
           </form>
         </div>
@@ -137,9 +158,15 @@
       function mapearEventos() {
         return (JSON.parse(localStorage.getItem("citas")) || []).map((cita, idx) => ({
           id: idx.toString(),
-          title: cita.medico,
+          title: cita.titulo || cita.medico,
           start: `${cita.fecha}T${cita.hora}`,
-          extendedProps: { nombre: cita.nombre, correo: cita.correo }
+          extendedProps: {
+            nombre: cita.nombre,
+            correo: cita.correo,
+            medico: cita.medico,
+            descripcion: cita.descripcion,
+            tipo: cita.tipo
+          }
         }));
       }
 
@@ -164,7 +191,8 @@
           }
 
           const nombre = info.event.extendedProps.nombre || "Paciente";
-          if (confirm(`¿Eliminar la cita de ${nombre} con ${info.event.title}?`)) {
+          const titulo = info.event.title || "Cita";
+          if (confirm(`¿Eliminar la cita "${titulo}" de ${nombre}?`)) {
             const indice = parseInt(info.event.id, 10);
             let citasLS = JSON.parse(localStorage.getItem("citas")) || [];
 
@@ -195,6 +223,9 @@
       const medicoSelect = document.getElementById('medicoSelect');
       const horaInput = document.getElementById('horaInput');
       const correoInput = document.getElementById('correoInput');
+      const tituloInput = document.getElementById('tituloInput');
+      const descripcionInput = document.getElementById('descripcionInput');
+      const tipoSelect = document.getElementById('tipoSelect');
 
       // Ajustar min y max del input de hora según el médico seleccionado
       medicoSelect.addEventListener('change', function() {
@@ -229,6 +260,9 @@
         const hora = horaInput.value;
         const correo = correoInput.value.trim();
         const fecha = selectedDate;
+        const titulo = tituloInput.value.trim();
+        const descripcion = descripcionInput.value.trim();
+        const tipo = tipoSelect.value;
 
         // Validación de horario (defensiva)
         const horario = horariosDoctores[medico];
@@ -250,7 +284,7 @@
           return;
         }
 
-        const nuevaCita = { nombre, medico, hora, correo, fecha };
+        const nuevaCita = { nombre, medico, hora, correo, fecha, titulo, descripcion, tipo };
         citasLS.push(nuevaCita);
         localStorage.setItem("citas", JSON.stringify(citasLS));
 
@@ -258,9 +292,9 @@
         const nuevoId = (citasLS.length - 1).toString();
         calendar.addEvent({
           id: nuevoId,
-          title: medico,
+          title: titulo || medico,
           start: `${fecha}T${hora}`,
-          extendedProps: { nombre, correo }
+          extendedProps: { nombre, correo, medico, descripcion, tipo }
         });
 
         alert("✅ Cita registrada correctamente.");
