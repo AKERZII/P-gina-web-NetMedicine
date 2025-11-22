@@ -1,0 +1,87 @@
+/* --- ESTILO GENERAL CONSISTENTE CON EL SITIO --- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Times New Roman', serif;
+  background-color: #f0f4f7;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* --- CUADRO PRINCIPAL --- */
+.container {
+  width: 450px;
+  background: linear-gradient(to bottom, #ffffff, #e8eff5);
+  padding: 30px 35px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  border: 1px solid #cdd6df;
+}
+
+/* --- TÍTULO --- */
+h2 {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #2e3a44;
+  margin-bottom: 20px;
+  text-shadow: 1px 1px 2px rgba(180, 180, 180, 0.4);
+}
+
+/* --- LABELS --- */
+label {
+  font-weight: bold;
+  color: #2e3a44;
+  font-size: 16px;
+}
+
+/* --- INPUTS --- */
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0 18px;
+  border: 1px solid #aebac5;
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: #f9fbfd;
+  transition: border 0.3s ease, background 0.3s ease;
+}
+
+/* Estados de validación */
+input.correcto {
+  border: 2px solid #4CAF50;
+  background: #eaf7ea;
+}
+
+input.error {
+  border: 2px solid #e74c3c;
+  background: #fdeaea;
+}
+
+/* --- BOTÓN PRINCIPAL --- */
+button {
+  width: 100%;
+  padding: 12px;
+  background-color: #4c7ea6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 17px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background-color: #365b7d;
+}
+
+/* --- MENSAJE DE CONFIRMACIÓN --- */
+#mensaje {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+}

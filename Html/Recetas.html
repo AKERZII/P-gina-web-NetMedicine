@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recetas - Red Médica</title>
+    <link rel="stylesheet" href="Recetas.css
+">
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Registrar Receta</h2>
+
+        <form id="receta-form">
+
+            <label>Medicamento</label>
+            <input type="text" id="medicamento" required>
+
+            <label>Cantidad</label>
+            <input type="text" id="cantidad" required>
+
+            <label>Administración</label>
+            <input type="text" id="admin" required>
+
+            <label>Periodo</label>
+            <input type="text" id="periodo" required>
+
+            <label>Otro</label>
+            <input type="text" id="otro">
+
+            <label>Correo del paciente</label>
+            <input type="email" id="correo" required>
+
+            <button type="submit">Guardar receta</button>
+
+        </form>
+
+        <p id="mensaje"></p>
+    </div>
+
+    <script src="recetas.js"></script>
+</body>
+</html>
