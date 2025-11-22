@@ -102,25 +102,29 @@ body {
   display: block;
 }
 
-/* --- SLIDER --- */
-.hero {
+/* Contenedor */
+.slider {
   position: relative;
   width: 100%;
-  height: 500px;
+  height: 350px; /* Mantén tu medida */
   overflow: hidden;
 }
 
-.slides {
-  display: flex;
-  width: 300%;
-  animation: slide 15s infinite;
+/* Todas las imágenes una encima de otra */
+.slider .slides img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
 }
 
-.slides img {
-  width: 100%;
-  height: 500px;
-  object-fit: cover;
+/* Imagen visible */
+.slider .slides img.active {
+  opacity: 1;
 }
+
 
 /* --- TÍTULO SOBRE EL SLIDER --- */
 .titulo-hero {
@@ -131,7 +135,9 @@ body {
   font-size: 50px;
   color: white;
   text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+
 }
+
 body {
       background-color: #f4f6f9;
       font-family: 'Segoe UI', sans-serif;
@@ -201,3 +207,4 @@ body {
   70% { transform: translateX(-200%); }
   100% { transform: translateX(-200%); }
 }
+
