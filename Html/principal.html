@@ -34,6 +34,7 @@
   <nav class="navbar">
     <ul class="menu">
       <li><a href="Principal.html">Inicio</a></li>
+      <li><a href="Recetas.html">Recetas</a></li>
       <li><a href="Medicos.html">Médicos</a></li>
       <li><a href="Agenda.html">Agenda</a></li>
       <li><a href="Consultas.html">Consultas</a></li>
@@ -55,7 +56,7 @@
   </nav>
 
   <script>
-    // Mostrar enlace a Usuarios solo si es administrador
+    
     const rolUsuario = localStorage.getItem("rolUsuario");
     if (rolUsuario === "admin") {
       const submenu = document.getElementById("submenuServicios");
@@ -65,15 +66,33 @@
     }
   </script>
 
-  <section class="hero">
-    <div class="slider">
-      <div class="slides">
-        <img src="img/images.jpg" alt="">
-        <img src="img/post_WhatsApp_Image_2023-03-12_at_10.06.19_AM__1_.jpeg" alt="">
-        <img src="img/0_Fachada-HAMexico.jpg" alt="">
-      </div>
-      <h1 class="titulo-hero">Red Médica</h1>
+<section class="hero">
+  <div class="slider">
+    <div class="slides fade-slider">
+      <img src="img/images.jpg" alt="">
+      <img src="img/post_WhatsApp_Image_2023-03-12_at_10.06.19_AM__1_.jpeg" alt="">
+      <img src="img/0_Fachada-HAMexico.jpg" alt="">
     </div>
-  </section>
+    <h1 class="titulo-hero">Red Médica</h1>
+  </div>
+</section>
+
+<script>
+  const slides = document.querySelectorAll(".slides img");
+  let index = 0;
+
+  function showSlide() {
+    slides.forEach(img => img.classList.remove("active"));
+    slides[index].classList.add("active");
+    index = (index + 1) % slides.length;
+  }
+
+  
+  showSlide();
+
+  
+  setInterval(showSlide, 4000);
+</script>
+
 </body>
 </html>
