@@ -28,7 +28,9 @@
           <p>Bienvenido, <strong>${usuarioActual}</strong> (${rol || 'sin rol'})</p>
           <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>`;
         document.getElementById("logoutBtn").addEventListener("click", () => {
-          localStorage.removeItem("usuarioActual"); localStorage.removeItem("rolUsuario"); window.location.reload();
+          localStorage.removeItem("usuarioActual");
+          localStorage.removeItem("rolUsuario");
+          window.location.reload();
         });
       }
     </script>
@@ -87,13 +89,12 @@
               <label class="form-label">Archivo de imagen</label>
               <input type="text" id="imagen" class="form-control" placeholder="doctor1.jpg" required>
               <div class="invalid-feedback">Ingresa el nombre del archivo de imagen.</div>
-              <small class="text-muted">Usa archivos locales existentes (p.ej., doctor1.jpg, doctora2.jpg).</small>
+              <small class="text-muted">Usa solo el nombre del archivo (ej. doctor1.jpg). El sistema añadirá "img/".</small>
             </div>
             <div class="mb-3">
               <label class="form-label">Perfil HTML</label>
               <input type="text" id="perfil" class="form-control" placeholder="doctor1.html" required>
               <div class="invalid-feedback">Ingresa el archivo de perfil.</div>
-              <small class="text-muted">Debe existir el archivo de perfil correspondiente.</small>
             </div>
             <div class="mb-3">
               <label class="form-label">Horario inicio</label>
@@ -115,7 +116,7 @@
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Ocultar controles admin si el rol no es administrador
+    // Gate de rol para botones admin
     (function gateByRole(){
       const rol = localStorage.getItem("rolUsuario");
       if (rol !== "admin") {
@@ -123,7 +124,11 @@
       }
     })();
 
-    // Datos iniciales (seed) si no existe localStorage.medicos
+    function cryptoRandomId(){
+      return 'm_' + Math.random().toString(36).slice(2,10);
+    }
+
+    // Semilla inicial: usa SOLO nombres de archivo (sin "img/")
     const seedMedicos = [
       { id: cryptoRandomId(), nombre:"Dr. Juan García", especialidad:"Cardiología", descripcion:"Especialista en enfermedades cardiovasculares y prevención.", imagen:"doctor1.jpg", perfil:"doctor1.html", inicio:"09:00", fin:"14:00" },
       { id: cryptoRandomId(), nombre:"Dra. María López", especialidad:"Pediatría", descripcion:"Atención integral para niños y adolescentes.", imagen:"doctora1.jpg", perfil:"doctora1.html", inicio:"10:00", fin:"16:00" },
@@ -135,10 +140,6 @@
       { id: cryptoRandomId(), nombre:"Dra. Laura Navarro", especialidad:"Endocrinología", descripcion:"Trastornos hormonales y metabólicos.", imagen:"doctora4.jpg", perfil:"doctora4.html", inicio:"09:00", fin:"13:00" },
       { id: cryptoRandomId(), nombre:"Dr. Roberto Hernández", especialidad:"Medicina Interna", descripcion:"Diagnóstico y manejo de enfermedades complejas.", imagen:"doctor5.jpg", perfil:"doctor5.html", inicio:"10:00", fin:"16:00" }
     ];
-
-    function cryptoRandomId(){
-      return 'm_' + Math.random().toString(36).slice(2,10);
-    }
 
     function getMedicos(){
       let medicos = JSON.parse(localStorage.getItem("medicos"));
@@ -153,14 +154,24 @@
       localStorage.setItem("medicos", JSON.stringify(medicos));
     }
 
+    // Construye src siempre como "img/archivo.jpg"
+    function buildImgSrc(fileOrPath){
+      if (!fileOrPath || typeof fileOrPath !== "string") return "img/placeholder.jpg";
+      const clean = fileOrPath.trim();
+      // Si ya viene con "img/", quita el prefijo para evitar duplicaciones y vuelve a prefijar
+      const filename = clean.replace(/^img\//, "");
+      return "img/" + filename;
+    }
+
     function renderGrid(){
       const rol = localStorage.getItem("rolUsuario");
       const cont = document.getElementById("gridMedicos");
       const medicos = getMedicos();
+
       cont.innerHTML = medicos.map(m => `
         <div class="col">
           <div class="card h-100">
-            <img src="${m.imagen}" class="card-img-top" alt="${m.nombre}">
+            <img src="${buildImgSrc(m.imagen)}" class="card-img-top" alt="${m.nombre}">
             <div class="card-body">
               <h5 class="card-title">${m.nombre}</h5>
               <p class="card-text"><strong>${m.especialidad}</strong></p>
@@ -176,7 +187,6 @@
         </div>
       `).join('');
 
-      // Bind admin actions
       cont.querySelectorAll("button.btn-admin").forEach(btn=>{
         btn.addEventListener("click", onAdminAction);
       });
@@ -217,7 +227,8 @@
       document.getElementById('nombre').value = item?.nombre || '';
       document.getElementById('especialidad').value = item?.especialidad || '';
       document.getElementById('descripcion').value = item?.descripcion || '';
-      document.getElementById('imagen').value = item?.imagen || '';
+      // Mostramos solo el nombre de archivo en el campo
+      document.getElementById('imagen').value = (item?.imagen || '').replace(/^img\//, '');
       document.getElementById('perfil').value = item?.perfil || '';
       document.getElementById('inicio').value = item?.inicio || '';
       document.getElementById('fin').value = item?.fin || '';
@@ -240,13 +251,13 @@
         nombre: document.getElementById('nombre').value.trim(),
         especialidad: document.getElementById('especialidad').value.trim(),
         descripcion: document.getElementById('descripcion').value.trim(),
-        imagen: document.getElementById('imagen').value.trim(),
+        // Guardamos solo el nombre del archivo; el render añadirá "img/"
+        imagen: document.getElementById('imagen').value.trim().replace(/^img\//, ''),
         perfil: document.getElementById('perfil').value.trim(),
         inicio: document.getElementById('inicio').value,
         fin: document.getElementById('fin').value
       };
 
-      // Simple horario sanity check
       if (payload.fin < payload.inicio) {
         alert("El horario fin no puede ser menor que el inicio.");
         return;

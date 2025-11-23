@@ -1,44 +1,91 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Recetas - Red Médica</title>
-    <link rel="stylesheet" href="Recetas.css
-">
+  <meta charset="UTF-8">
+  <title>Recetas | Red Médica</title>
+  <link rel="stylesheet" href="Principal.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { animation: fadeInPage 0.8s ease-in-out; }
+    @keyframes fadeInPage { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .container { max-width: 800px; margin: 50px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 30px; }
+    label { margin-top: 10px; font-weight: 600; }
+    button { margin-top: 20px; }
+  </style>
 </head>
-
 <body>
+  <!-- ENCABEZADO -->
+  <header class="top-header">
+    <div class="logo"><img src="img/Logo.jpg" alt="Logo"></div>
+    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
+    <div class="login" id="loginArea"><a href="login.html" class="btn-login">Iniciar Sesión</a></div>
+    <script>
+      const usuarioActual = localStorage.getItem("usuarioActual");
+      if (usuarioActual) {
+        document.getElementById("loginArea").innerHTML = `
+          <p>Bienvenido, <strong>${usuarioActual}</strong></p>
+          <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>`;
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+          localStorage.removeItem("usuarioActual"); window.location.reload();
+        });
+      }
+    </script>
+  </header>
 
-    <div class="container">
-        <h2>Registrar Receta</h2>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <ul class="menu">
+      <li><a href="Principal.html">Inicio</a></li>
+      <li><a href="Medicos.html">Médicos</a></li>
+      <li><a href="Agenda.html">Agenda</a></li>
+      <li><a href="Consultas.html">Consultas</a></li>
+      <li class="dropdown">
+        <a href="#">Servicios ▾</a>
+        <ul class="submenu">
+          <li><a href="Consultas.html">Consultas</a></li>
+          <li><a href="Hospitalizacion.html">Hospitalización</a></li>
+          <li><a href="Laboratorio.html">Laboratorio Clínico</a></li>
+          <li><a href="Rehabilitacion.html">Rehabilitación</a></li>
+          <li><a href="SaludMental.html">Salud Mental</a></li>
+          <li><a href="Farmacia.html">Farmacia</a></li>
+          <li><a href="Urgencias.html">Urgencias</a></li>
+          <li><a href="Planificacion.html">Planificación Familiar</a></li>
+        </ul>
+      </li>
+      <li><a href="Recetas.html">Recetas</a></li>
+    </ul>
+  </nav>
 
-        <form id="receta-form">
+  <!-- FORMULARIO DE RECETAS -->
+  <div class="container">
+    <h2 class="mb-4">Registrar Receta</h2>
 
-            <label>Medicamento</label>
-            <input type="text" id="medicamento" required>
+    <form id="receta-form" class="needs-validation" novalidate>
+      <label>Medicamento</label>
+      <input type="text" id="medicamento" list="lista-medicamentos" class="form-control" required>
+      <datalist id="lista-medicamentos"></datalist>
 
-            <label>Cantidad</label>
-            <input type="text" id="cantidad" required>
+      <label>Cantidad</label>
+      <input type="text" id="cantidad" class="form-control" required>
 
-            <label>Administración</label>
-            <input type="text" id="admin" required>
+      <label>Administración</label>
+      <input type="text" id="admin" class="form-control" required>
 
-            <label>Periodo</label>
-            <input type="text" id="periodo" required>
+      <label>Periodo</label>
+      <input type="text" id="periodo" class="form-control" required>
 
-            <label>Otro</label>
-            <input type="text" id="otro">
+      <label>Otro</label>
+      <input type="text" id="otro" class="form-control">
 
-            <label>Correo del paciente</label>
-            <input type="email" id="correo" required>
+      <label>Correo del paciente</label>
+      <input type="email" id="correo" class="form-control" required>
 
-            <button type="submit">Guardar receta</button>
+      <button type="submit" class="btn btn-primary w-100">Guardar receta</button>
+    </form>
 
-        </form>
+    <p id="mensaje" class="mt-3"></p>
+  </div>
 
-        <p id="mensaje"></p>
-    </div>
-
-    <script src="recetas.js"></script>
+  <script src="recetas.js"></script>
 </body>
 </html>

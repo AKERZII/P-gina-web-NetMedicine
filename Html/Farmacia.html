@@ -52,8 +52,57 @@
   </nav>
 
   <div class="container">
-    <h1 class="mb-4">Farmacia</h1>
-    <p>Medicamentos disponibles, horarios y servicios de surtido.</p>
+    <h1 class="mb-3">Catálogo de Medicamentos</h1>
+    <p class="mb-4">
+      Este listado es únicamente de referencia para recetas médicas.  
+      <strong>Nota:</strong> Red Médica no distribuye ni vende medicamentos, los pacientes deben adquirirlos en su farmacia de preferencia.
+    </p>
+
+    <table class="table table-hover">
+      <thead class="table-primary">
+        <tr>
+          <th>Nombre</th>
+          <th>Presentación</th>
+          <th>Administración</th>
+        </tr>
+      </thead>
+      <tbody id="listaMedicamentos"></tbody>
+    </table>
   </div>
+
+  <script>
+    const seedMedicamentos = [
+      { id:"med-001", nombre:"Paracetamol", presentacion:"500 mg tabletas", admin:"Oral" },
+      { id:"med-002", nombre:"Ibuprofeno", presentacion:"400 mg tabletas", admin:"Oral" },
+      { id:"med-003", nombre:"Amoxicilina", presentacion:"500 mg cápsulas", admin:"Oral" },
+      { id:"med-004", nombre:"Omeprazol", presentacion:"20 mg cápsulas", admin:"Oral" },
+      { id:"med-005", nombre:"Loratadina", presentacion:"10 mg tabletas", admin:"Oral" },
+      { id:"med-006", nombre:"Salbutamol", presentacion:"Inhalador 100 mcg", admin:"Inhalada" },
+      { id:"med-007", nombre:"Metformina", presentacion:"850 mg tabletas", admin:"Oral" },
+      { id:"med-008", nombre:"Losartán", presentacion:"50 mg tabletas", admin:"Oral" },
+      { id:"med-009", nombre:"Diclofenaco", presentacion:"50 mg tabletas", admin:"Oral" },
+      { id:"med-010", nombre:"Azitromicina", presentacion:"500 mg tabletas", admin:"Oral" },
+      { id:"med-011", nombre:"Prednisona", presentacion:"5 mg tabletas", admin:"Oral" },
+      { id:"med-012", nombre:"Ranitidina", presentacion:"150 mg tabletas", admin:"Oral" }
+    ];
+
+    (function initMedicamentos(){
+      localStorage.setItem("medicamentos", JSON.stringify(seedMedicamentos));
+    })();
+
+    function renderMedicamentos(){
+      const meds = JSON.parse(localStorage.getItem("medicamentos")) || [];
+      const tbody = document.getElementById("listaMedicamentos");
+      tbody.innerHTML = meds.map(m => `
+        <tr>
+          <td>${m.nombre}</td>
+          <td>${m.presentacion}</td>
+          <td>${m.admin}</td>
+        </tr>
+      `).join('');
+    }
+
+    renderMedicamentos();
+  </script>
 </body>
 </html>
