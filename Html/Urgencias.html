@@ -8,12 +8,15 @@
   <style>
     body { animation: fadeInPage 0.8s ease-in-out; }
     @keyframes fadeInPage { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .container { max-width: 900px; margin: 50px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 30px; }
+    .container { max-width: 1000px; margin: 50px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 30px; }
+    .hero-img { width: 100%; border-radius: 12px; margin-bottom: 20px; }
+    h2 { margin-top: 28px; }
   </style>
 </head>
 <body>
+  <!-- ENCABEZADO -->
   <header class="top-header">
-    <div class="logo"><img src="img/Logo.jpg" alt=""></div>
+    <div class="logo"><img src="img/Logo.jpg" alt="Logo Red Médica"></div>
     <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
     <div class="login" id="loginArea"><a href="login.html" class="btn-login">Iniciar Sesión</a></div>
     <script>
@@ -29,6 +32,7 @@
     </script>
   </header>
 
+  <!-- NAVBAR -->
   <nav class="navbar">
     <ul class="menu">
       <li><a href="Principal.html">Inicio</a></li>
@@ -51,9 +55,33 @@
     </ul>
   </nav>
 
+  <!-- CONTENIDO -->
   <div class="container">
     <h1 class="mb-4">Urgencias</h1>
-    <p>Atención 24/7. Información operativa y rutas de acceso.</p>
+    <img src="img/urgencias.jpg" alt="Área de urgencias hospitalarias" class="hero-img">
+
+    <p>La <strong>atención de urgencias</strong> se refiere a la asistencia médica inmediata que se brinda a personas con condiciones que ponen en riesgo su vida o requieren intervención rápida. Es un componente esencial de cualquier sistema de salud.</p>
+
+    <h2>Situaciones comunes de urgencia</h2>
+    <ul>
+      <li>Accidentes y traumatismos graves.</li>
+      <li>Problemas cardíacos agudos (como infartos).</li>
+      <li>Dificultades respiratorias severas.</li>
+      <li>Hemorragias importantes.</li>
+      <li>Reacciones alérgicas graves.</li>
+    </ul>
+
+    <h2>Características generales</h2>
+    <p>Los servicios de urgencias suelen estar disponibles <strong>las 24 horas del día, los 7 días de la semana</strong>. Incluyen áreas de triage para clasificar la gravedad de los casos, personal médico especializado y acceso a equipos de diagnóstico inmediato.</p>
+
+    <h2>Acceso y rutas</h2>
+    <p>La ubicación y rutas de acceso a urgencias dependen de cada hospital o clínica. Es recomendable identificar previamente los centros más cercanos a tu domicilio o lugar de trabajo para acudir rápidamente en caso de necesidad.</p>
+
+    <h2>Nota importante</h2>
+    <p><em>Red Médica no ofrece atención de urgencias directamente.</em> Nuestra función es conectar a los usuarios con hospitales y clínicas que cuentan con este servicio. Los <strong>horarios, protocolos y tiempos de espera</strong> pueden variar según la institución elegida.</p>
+
+    <h2>Más información</h2>
+    <p>Para conocer detalles específicos sobre la atención de urgencias, te recomendamos contactar directamente con el hospital o clínica de tu preferencia.</p>
   </div>
 </body>
 </html>

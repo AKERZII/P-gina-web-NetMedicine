@@ -8,12 +8,15 @@
   <style>
     body { animation: fadeInPage 0.8s ease-in-out; }
     @keyframes fadeInPage { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .container { max-width: 900px; margin: 50px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 30px; }
+    .container { max-width: 1000px; margin: 50px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 30px; }
+    .hero-img { width: 100%; border-radius: 12px; margin-bottom: 20px; }
+    h2 { margin-top: 30px; }
   </style>
 </head>
 <body>
+  <!-- ENCABEZADO -->
   <header class="top-header">
-    <div class="logo"><img src="img/Logo.jpg" alt=""></div>
+    <div class="logo"><img src="img/Logo.jpg" alt="Logo Red Médica"></div>
     <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
     <div class="login" id="loginArea"><a href="login.html" class="btn-login">Iniciar Sesión</a></div>
     <script>
@@ -29,6 +32,7 @@
     </script>
   </header>
 
+  <!-- NAVBAR -->
   <nav class="navbar">
     <ul class="menu">
       <li><a href="Principal.html">Inicio</a></li>
@@ -51,9 +55,33 @@
     </ul>
   </nav>
 
+  <!-- CONTENIDO -->
   <div class="container">
     <h1 class="mb-4">Hospitalización</h1>
-    <p>Información general del servicio de hospitalización, políticas y horarios.</p>
+    <img src="img/hospital.jpg" alt="Área de hospitalización" class="hero-img">
+
+    <p>La <strong>hospitalización</strong> es el proceso mediante el cual un paciente permanece en un hospital para recibir atención médica continua. Puede ser necesaria por diversos motivos, como cirugías, tratamientos especializados o vigilancia médica prolongada.</p>
+
+    <h2>Aspectos generales</h2>
+    <p>En la mayoría de los hospitales, la hospitalización incluye:</p>
+    <ul>
+      <li>Habitaciones privadas o compartidas.</li>
+      <li>Supervisión médica y de enfermería constante.</li>
+      <li>Acceso a estudios y tratamientos especializados.</li>
+      <li>Espacios de visita para familiares.</li>
+    </ul>
+
+    <h2>Ingreso</h2>
+    <p>El ingreso a hospitalización suele requerir indicación médica y documentación básica del paciente. Dependiendo del hospital, pueden solicitar identificación oficial, historial clínico y autorización de un médico tratante.</p>
+
+    <h2>Visitas</h2>
+    <p>Los <strong>horarios de visita</strong> varían según cada hospital. Generalmente se establecen franjas durante el día para permitir la presencia de familiares, procurando mantener un ambiente tranquilo para la recuperación.</p>
+
+    <h2>Nota importante</h2>
+    <p><em>Red Médica no ofrece hospitalización directamente.</em> Nuestra función es conectar a los usuarios con hospitales y clínicas que sí cuentan con este servicio. Los detalles como horarios, políticas de ingreso y servicios adicionales pueden variar según el hospital elegido.</p>
+
+    <h2>Más información</h2>
+    <p>Si deseas conocer las políticas específicas de hospitalización, te recomendamos consultar directamente con el hospital de tu preferencia.</p>
   </div>
 </body>
 </html>
