@@ -13,36 +13,22 @@
     h2 { margin-top: 28px; }
   </style>
 </head>
-<body>
-  <!-- ENCABEZADO -->
+<body class="fade-in">
   <header class="top-header">
     <div class="logo"><img src="img/Logo.jpg" alt="Logo Red Médica"></div>
-    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
+    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | contacto@redmedica.mx</p></div>
     <div class="login" id="loginArea"><a href="login.html" class="btn-login">Iniciar Sesión</a></div>
-    <script>
-      const usuarioActual = localStorage.getItem("usuarioActual");
-      if (usuarioActual) {
-        document.getElementById("loginArea").innerHTML = `
-          <p>Bienvenido, <strong>${usuarioActual}</strong></p>
-          <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>`;
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-          localStorage.removeItem("usuarioActual"); window.location.reload();
-        });
-      }
-    </script>
   </header>
 
-  <!-- NAVBAR -->
   <nav class="navbar">
     <ul class="menu">
       <li><a href="Principal.html">Inicio</a></li>
-      <li><a href="Medicos.html">Médicos</a></li>
+      <li><a href="Medicos.html">Hospitales & Médicos</a></li>
       <li><a href="Agenda.html">Agenda</a></li>
       <li><a href="Consultas.html">Consultas</a></li>
       <li class="dropdown">
         <a href="#">Servicios ▾</a>
         <ul class="submenu">
-          <li><a href="Consultas.html">Consultas</a></li>
           <li><a href="Hospitalizacion.html">Hospitalización</a></li>
           <li><a href="Laboratorio.html">Laboratorio Clínico</a></li>
           <li><a href="Rehabilitacion.html">Rehabilitación</a></li>
@@ -52,10 +38,11 @@
           <li><a href="Planificacion.html">Planificación Familiar</a></li>
         </ul>
       </li>
+      <li><a href="Recetas.html">Recetas</a></li>
     </ul>
   </nav>
 
-  <!-- CONTENIDO -->
+
   <div class="container">
     <h1 class="mb-4">Rehabilitación</h1>
     <img src="img/rehabilitacion.jpg" alt="Sesión de rehabilitación física" class="hero-img">
@@ -91,5 +78,7 @@
     <h2>Más información</h2>
     <p>Para conocer detalles específicos (tipos de terapias disponibles, tiempos de espera, requisitos y costos), te recomendamos contactar directamente al hospital o clínica de tu preferencia.</p>
   </div>
+
+  <script src="navbar.js"></script>
 </body>
 </html>

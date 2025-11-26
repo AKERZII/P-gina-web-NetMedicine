@@ -5,42 +5,25 @@
   <title>Consultas | Red Médica</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="Principal.css">
-  <style>
-    body { animation: fadeInPage 0.8s ease-in-out; }
-    @keyframes fadeInPage { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .container { margin-top: 50px; }
-    table { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-  </style>
 </head>
-<body>
-
+<body class="fade-in">
   <header class="top-header">
-    <div class="logo"><img src="img/Logo.jpg" alt=""></div>
-    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
-    <div class="login" id="loginArea"><a href="principal.html" class="btn-login">Iniciar Sesión</a></div>
-    <script>
-      const usuarioActual = localStorage.getItem("usuarioActual");
-      if (usuarioActual) {
-        document.getElementById("loginArea").innerHTML = `
-          <p>Bienvenido, <strong>${usuarioActual}</strong></p>
-          <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>`;
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-          localStorage.removeItem("usuarioActual"); window.location.reload();
-        });
-      }
-    </script>
+    <div class="logo"><img src="img/Logo.jpg" alt="Logo Red Médica"></div>
+    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | contacto@redmedica.mx</p></div>
+    <div class="login" id="loginArea">
+      <a href="login.html" class="btn-login">Iniciar Sesión</a>
+    </div>
   </header>
 
   <nav class="navbar">
     <ul class="menu">
       <li><a href="Principal.html">Inicio</a></li>
-      <li><a href="Medicos.html">Médicos</a></li>
+      <li><a href="Medicos.html">Hospitales & Médicos</a></li>
       <li><a href="Agenda.html">Agenda</a></li>
       <li><a href="Consultas.html">Consultas</a></li>
       <li class="dropdown">
         <a href="#">Servicios ▾</a>
         <ul class="submenu">
-          <li><a href="Consultas.html">Consultas</a></li>
           <li><a href="Hospitalizacion.html">Hospitalización</a></li>
           <li><a href="Laboratorio.html">Laboratorio Clínico</a></li>
           <li><a href="Rehabilitacion.html">Rehabilitación</a></li>
@@ -50,33 +33,40 @@
           <li><a href="Planificacion.html">Planificación Familiar</a></li>
         </ul>
       </li>
+      <li><a href="Recetas.html">Recetas</a></li>
+      <li><a href="Reportes.html">Reportes</a></li>
     </ul>
   </nav>
 
   <div class="container">
     <h1 class="text-center mb-4">Listado de Citas Registradas</h1>
-    <table class="table table-striped">
-      <thead class="table-primary">
-        <tr>
-          <th>Nombre</th>
-          <th>Médico</th>
-          <th>Hora</th>
-          <th>Correo</th>
-          <th>Fecha</th>
-          <th>Título</th>
-          <th>Descripción</th>
-          <th>Tipo</th>
-        </tr>
-      </thead>
-      <tbody id="listaCitas"></tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="table table-striped table-custom">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Médico</th>
+            <th>Hora</th>
+            <th>Correo</th>
+            <th>Fecha</th>
+            <th>Título</th>
+            <th>Descripción</th>
+            <th>Tipo</th>
+          </tr>
+        </thead>
+        <tbody id="listaCitas">
+          <!-- Se llenará dinámicamente -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
+  <script src="navbar.js"></script>
   <script>
     const citas = JSON.parse(localStorage.getItem("citas")) || [];
     const lista = document.getElementById("listaCitas");
     if (citas.length === 0) {
-      lista.innerHTML = `<tr><td colspan="8" class="text-center">No hay citas registradas</td></tr>`;
+      lista.innerHTML = `<tr><td colspan="8" class="text-center text-muted py-4">No hay citas registradas</td></tr>`;
     } else {
       lista.innerHTML = citas.map(cita => `
         <tr>

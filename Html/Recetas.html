@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Recetas | Red Médica</title>
+  <title>Recetas Médicas | Red Médica</title>
   <link rel="stylesheet" href="Principal.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
@@ -11,13 +11,20 @@
     .container { max-width: 800px; margin: 50px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 30px; }
     label { margin-top: 10px; font-weight: 600; }
     button { margin-top: 20px; }
+    .btn-generar { background-color: #28a745; color: white; }
+    .btn-generar:hover { background-color: #218838; }
+    .receta-preview { border: 2px dashed #dee2e6; padding: 20px; border-radius: 8px; margin-top: 20px; display: none; }
+    .error-fecha { color: #dc3545; font-size: 0.875em; margin-top: 0.25rem; display: none; }
   </style>
+  <!-- Incluir jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
   <!-- ENCABEZADO -->
   <header class="top-header">
     <div class="logo"><img src="img/Logo.jpg" alt="Logo"></div>
-    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
+    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | contacto@redmedica.mx</p></div>
     <div class="login" id="loginArea"><a href="login.html" class="btn-login">Iniciar Sesión</a></div>
     <script>
       const usuarioActual = localStorage.getItem("usuarioActual");
@@ -36,13 +43,12 @@
   <nav class="navbar">
     <ul class="menu">
       <li><a href="Principal.html">Inicio</a></li>
-      <li><a href="Medicos.html">Médicos</a></li>
+      <li><a href="Medicos.html">Hospitales & Médicos</a></li>
       <li><a href="Agenda.html">Agenda</a></li>
       <li><a href="Consultas.html">Consultas</a></li>
       <li class="dropdown">
         <a href="#">Servicios ▾</a>
         <ul class="submenu">
-          <li><a href="Consultas.html">Consultas</a></li>
           <li><a href="Hospitalizacion.html">Hospitalización</a></li>
           <li><a href="Laboratorio.html">Laboratorio Clínico</a></li>
           <li><a href="Rehabilitacion.html">Rehabilitación</a></li>
@@ -56,36 +62,411 @@
     </ul>
   </nav>
 
+
   <!-- FORMULARIO DE RECETAS -->
   <div class="container">
-    <h2 class="mb-4">Registrar Receta</h2>
+    <h2 class="mb-4">Registrar Receta Médica</h2>
 
     <form id="receta-form" class="needs-validation" novalidate>
-      <label>Medicamento</label>
-      <input type="text" id="medicamento" list="lista-medicamentos" class="form-control" required>
-      <datalist id="lista-medicamentos"></datalist>
+      <!-- Información del Médico -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h5>Información del Médico</h5>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Médico que prescribe</label>
+          <select id="medicoPrescribe" class="form-select" required>
+            <option value="">Seleccione un médico</option>
+            <!-- Se llenará dinámicamente con los médicos disponibles -->
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Cédula profesional</label>
+          <input type="text" id="cedulaProfesional" class="form-control" placeholder="Ingrese cédula profesional" required readonly>
+        </div>
+      </div>
 
-      <label>Cantidad</label>
-      <input type="text" id="cantidad" class="form-control" required>
+      <!-- Información del Paciente -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h5>Información del Paciente</h5>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Nombre del paciente</label>
+          <input type="text" id="nombrePaciente" class="form-control" placeholder="Juan Pérez Hernández" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Edad</label>
+          <input type="number" id="edadPaciente" class="form-control" placeholder="35" required>
+        </div>
+        <div class="col-12 mt-3">
+          <label class="form-label">Correo del paciente</label>
+          <input type="email" id="correoPaciente" class="form-control" placeholder="paciente@ejemplo.com" required>
+        </div>
+      </div>
 
-      <label>Administración</label>
-      <input type="text" id="admin" class="form-control" required>
+      <!-- Medicamentos -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <h5>Medicamentos Prescritos</h5>
+          <div id="medicamentos-container">
+            <!-- Primer medicamento -->
+            <div class="medicamento-item border p-3 mb-3 rounded">
+              <div class="row">
+                <div class="col-md-4">
+                  <label class="form-label">Medicamento</label>
+                  <input type="text" class="form-control medicamento-nombre" list="lista-medicamentos" placeholder="Paracetamol" required>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label">Cantidad</label>
+                  <input type="text" class="form-control medicamento-cantidad" placeholder="1 tableta" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Frecuencia</label>
+                  <input type="text" class="form-control medicamento-frecuencia" placeholder="Cada 8 horas" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label">Duración</label>
+                  <input type="text" class="form-control medicamento-duracion" placeholder="7 días" required>
+                </div>
+              </div>
+              <div class="row mt-2">
+                <div class="col-12">
+                  <label class="form-label">Instrucciones especiales</label>
+                  <input type="text" class="form-control medicamento-instrucciones" placeholder="Tomar después de los alimentos">
+                  <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="eliminarMedicamento(this)">
+                    Eliminar Medicamento
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedicamento()">
+            Agregar otro medicamento
+          </button>
+        </div>
+      </div>
 
-      <label>Periodo</label>
-      <input type="text" id="periodo" class="form-control" required>
+      <!-- Instrucciones adicionales -->
+      <div class="mb-4">
+        <label class="form-label">Instrucciones adicionales</label>
+        <textarea id="instruccionesAdicionales" class="form-control" rows="3" placeholder="Recomendaciones generales, dieta, etc."></textarea>
+      </div>
 
-      <label>Otro</label>
-      <input type="text" id="otro" class="form-control">
+      <!-- Fecha y firma -->
+      <div class="row mb-4">
+        <div class="col-md-6">
+          <label class="form-label">Fecha de prescripción</label>
+          <input type="date" id="fechaPrescripcion" class="form-control" required min="">
+          <div id="errorFecha" class="error-fecha">
+            No se puede seleccionar una fecha anterior al día actual.
+          </div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Lugar de expedición</label>
+          <input type="text" id="lugarExpedicion" class="form-control" value="Guadalajara, Jalisco" required>
+        </div>
+      </div>
 
-      <label>Correo del paciente</label>
-      <input type="email" id="correo" class="form-control" required>
-
-      <button type="submit" class="btn btn-primary w-100">Guardar receta</button>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+        <button type="button" class="btn btn-secondary me-md-2" onclick="previsualizarReceta()">
+          Previsualizar
+        </button>
+        <button type="submit" class="btn btn-primary">
+          Guardar Receta
+        </button>
+        <button type="button" id="btnGenerarPDF" class="btn btn-generar" onclick="generarPDF()" style="display: none;">
+          Generar PDF
+        </button>
+      </div>
     </form>
+
+    <!-- Previsualización -->
+    <div id="receta-preview" class="receta-preview">
+      <h5>Vista Previa de la Receta</h5>
+      <div id="preview-content"></div>
+    </div>
 
     <p id="mensaje" class="mt-3"></p>
   </div>
 
+  <datalist id="lista-medicamentos"></datalist>
+
   <script src="recetas.js"></script>
+    <script src="navbar.js"></script>
+    <!-- Agregar este script al final de Recetas.html, antes del cierre de </body> -->
+
+<script>
+// Personalización para médicos en Recetas
+document.addEventListener('DOMContentLoaded', function() {
+    const rolUsuario = localStorage.getItem('rolUsuario');
+    const medicoActual = localStorage.getItem('usuarioActual');
+    
+    if (rolUsuario === 'medico' && medicoActual) {
+        // Personalizar título
+        const titulo = document.querySelector('h2');
+        if (titulo) {
+            titulo.textContent = 'Generar Receta Médica';
+        }
+        
+        // Agregar mensaje informativo
+        const mensajeInfo = document.createElement('div');
+        mensajeInfo.className = 'alert alert-info mb-4';
+        mensajeInfo.innerHTML = `
+            <strong>Modo médico:</strong> Estás autorizado para generar recetas médicas para tus pacientes.
+        `;
+        
+        const container = document.querySelector('.container');
+        if (container) {
+            const form = container.querySelector('form');
+            if (form) {
+                container.insertBefore(mensajeInfo, form);
+            }
+        }
+        
+        // Configurar el médico automáticamente
+        setTimeout(() => {
+            const medicoSelect = document.getElementById('medicoPrescribe');
+            if (medicoSelect) {
+                // Buscar la opción que coincide con el médico actual
+                let medicoEncontrado = false;
+                for (let option of medicoSelect.options) {
+                    if (option.textContent.includes(medicoActual) || 
+                        option.value.includes(medicoActual)) {
+                        option.selected = true;
+                        medicoEncontrado = true;
+                        
+                        // Disparar el evento change para actualizar información
+                        const event = new Event('change');
+                        medicoSelect.dispatchEvent(event);
+                        break;
+                    }
+                }
+                
+                // Si no se encontró coincidencia exacta, buscar por nombre similar
+                if (!medicoEncontrado) {
+                    for (let option of medicoSelect.options) {
+                        if (option.textContent.toLowerCase().includes(medicoActual.toLowerCase())) {
+                            option.selected = true;
+                            medicoEncontrado = true;
+                            
+                            const event = new Event('change');
+                            medicoSelect.dispatchEvent(event);
+                            break;
+                        }
+                    }
+                }
+                
+                // Hacer el select de solo lectura para médicos
+                medicoSelect.disabled = true;
+                
+                // Agregar tooltip explicativo
+                medicoSelect.title = 'Usted está asignado como el médico que prescribe';
+                
+                // Si no se encontró el médico, mostrar advertencia
+                if (!medicoEncontrado) {
+                    const warning = document.createElement('div');
+                    warning.className = 'alert alert-warning mt-2';
+                    warning.innerHTML = `
+                        <small>No se encontró tu perfil médico completo en el sistema. 
+                        Contacta al administrador para actualizar tu información.</small>
+                    `;
+                    medicoSelect.parentNode.appendChild(warning);
+                }
+            }
+            
+            // Personalizar el campo de cédula profesional
+            const cedulaInput = document.getElementById('cedulaProfesional');
+            if (cedulaInput) {
+                cedulaInput.placeholder = 'Cédula profesional del médico';
+                
+                // Si está vacío, agregar un valor temporal
+                if (!cedulaInput.value) {
+                    cedulaInput.value = 'CEDULA_' + medicoActual.toUpperCase().replace(/\s/g, '_');
+                }
+            }
+            
+        }, 500);
+        
+        // Personalizar el formulario de envío para médicos
+        const recetaForm = document.getElementById('receta-form');
+        if (recetaForm) {
+            const originalSubmit = recetaForm.onsubmit;
+            
+            recetaForm.onsubmit = function(e) {
+                // Verificar que el médico esté correctamente asignado
+                const medicoSelect = document.getElementById('medicoPrescribe');
+                if (medicoSelect && medicoSelect.disabled) {
+                    // Agregar campo hidden con el médico actual
+                    let hiddenField = document.getElementById('medico-actual');
+                    if (!hiddenField) {
+                        hiddenField = document.createElement('input');
+                        hiddenField.type = 'hidden';
+                        hiddenField.id = 'medico-actual';
+                        hiddenField.name = 'medico_actual';
+                        hiddenField.value = medicoActual;
+                        recetaForm.appendChild(hiddenField);
+                    }
+                }
+                
+                if (originalSubmit) {
+                    return originalSubmit.call(this, e);
+                }
+            };
+        }
+        
+    } else if (rolUsuario === 'admin') {
+        // Para administradores, asegurar que todo esté habilitado
+        setTimeout(() => {
+            const medicoSelect = document.getElementById('medicoPrescribe');
+            if (medicoSelect) {
+                medicoSelect.disabled = false;
+                medicoSelect.title = 'Seleccione el médico que prescribe';
+            }
+        }, 500);
+        
+        // Personalizar título para admin
+        const titulo = document.querySelector('h2');
+        if (titulo) {
+            titulo.textContent = 'Registrar Receta Médica - Modo Administrador';
+        }
+    }
+    
+    // Para pacientes, restringir acceso
+    else if (rolUsuario === 'paciente') {
+        const container = document.querySelector('.container');
+        if (container) {
+            container.innerHTML = `
+                <div class="alert alert-danger text-center">
+                    <h3>Acceso Restringido</h3>
+                    <p>No tienes permisos para generar recetas médicas.</p>
+                    <p>Esta función está disponible solo para médicos y administradores.</p>
+                    <a href="Principal.html" class="btn btn-primary mt-3">Volver al Inicio</a>
+                </div>
+            `;
+        }
+    }
+    
+    // Si no hay usuario logueado
+    else if (!rolUsuario) {
+        const container = document.querySelector('.container');
+        if (container) {
+            container.innerHTML = `
+                <div class="alert alert-warning text-center">
+                    <h3>Acceso No Autorizado</h3>
+                    <p>Debes iniciar sesión para acceder a esta función.</p>
+                    <a href="login.html" class="btn btn-primary mt-3">Iniciar Sesión</a>
+                </div>
+            `;
+        }
+    }
+});
+</script>
+<script>
+// Función para guardar receta en la base de datos
+async function guardarRecetaEnBD(recetaData) {
+    try {
+        const formData = new FormData();
+        
+        // Datos principales
+        formData.append('medico', recetaData.medico);
+        formData.append('cedula', recetaData.cedula);
+        formData.append('paciente_nombre', recetaData.paciente);
+        formData.append('edad', recetaData.edad);
+        formData.append('correo', recetaData.correo);
+        formData.append('instrucciones', recetaData.instrucciones);
+        formData.append('fecha', recetaData.fecha);
+        formData.append('lugar', recetaData.lugar);
+        
+        // Medicamentos (convertir array a JSON)
+        formData.append('medicamentos', JSON.stringify(recetaData.medicamentos));
+
+        const response = await fetch('Php/guardar_receta.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            console.log('✅ Receta guardada en BD:', result.message);
+            return true;
+        } else {
+            console.error('❌ Error al guardar receta en BD:', result.message);
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Error de conexión:', error);
+        return false;
+    }
+}
+
+// Modificar el evento submit del formulario
+document.addEventListener('DOMContentLoaded', function() {
+    const recetaForm = document.getElementById('receta-form');
+    
+    if (recetaForm) {
+        const originalSubmit = recetaForm.onsubmit;
+        
+        recetaForm.onsubmit = async function(e) {
+            e.preventDefault();
+            
+            // Obtener datos de la receta
+            const datosReceta = obtenerDatosReceta();
+            if (!datosReceta) return false;
+
+            // Guardar en localStorage (como estaba antes)
+            guardarRecetaEnSistema(datosReceta);
+            
+            // Guardar en base de datos
+            const guardadoBD = await guardarRecetaEnBD(datosReceta);
+            
+            if (guardadoBD) {
+                mostrarMensaje(
+                    "Receta guardada correctamente en el sistema. El paciente debe adquirir el medicamento en su farmacia de preferencia.",
+                    'success'
+                );
+                
+                // Mostrar botón de PDF
+                document.getElementById('btnGenerarPDF').style.display = 'inline-block';
+                
+                // Limpiar formulario después de 2 segundos
+                setTimeout(() => {
+                    recetaForm.reset();
+                    // Restablecer médico actual si es médico
+                    const rolUsuario = localStorage.getItem('rolUsuario');
+                    if (rolUsuario === 'medico') {
+                        configurarMedicoActual();
+                    }
+                }, 2000);
+            } else {
+                mostrarMensaje(
+                    "La receta se guardó localmente pero hubo un error al guardar en la base de datos.",
+                    'error'
+                );
+            }
+            
+            return false;
+        };
+    }
+});
+
+// Función para configurar médico actual (para después de limpiar formulario)
+function configurarMedicoActual() {
+    const medicoActual = localStorage.getItem('usuarioActual');
+    const medicoSelect = document.getElementById('medicoPrescribe');
+    
+    if (medicoSelect && medicoActual) {
+        for (let option of medicoSelect.options) {
+            if (option.textContent.includes(medicoActual)) {
+                option.selected = true;
+                const event = new Event('change');
+                medicoSelect.dispatchEvent(event);
+                break;
+            }
+        }
+    }
+}
+</script>
 </body>
 </html>

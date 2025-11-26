@@ -1,4 +1,5 @@
 <?php
+session_start();
 header("Content-Type: application/json; charset=UTF-8");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -9,30 +10,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit;
     }
 
-    $correo      = $_POST["correoInput"]      ?? '';
-    $titulo      = $_POST["tituloInput"]      ?? '';
+    // Recibir datos del formulario de agenda
+    $nombre = $_POST["nombreInput"] ?? '';
+    $medico = $_POST["medicoSelect"] ?? '';
+    $hora = $_POST["horaInput"] ?? '';
+    $correo = $_POST["correoInput"] ?? '';
+    $fecha = $_POST["fechaInput"] ?? '';
+    $titulo = $_POST["tituloInput"] ?? '';
     $descripcion = $_POST["descripcionInput"] ?? '';
-    $fecha       = $_POST["fecha"]            ?? '';
-    $tipo        = $_POST["tipoSelect"]       ?? '';
+    $tipo = $_POST["tipoSelect"] ?? '';
 
-    if (empty($correo) || empty($titulo) || empty($descripcion) || empty($fecha) || empty($tipo)) {
+    // Validaciones
+    if (empty($nombre) || empty($medico) || empty($hora) || empty($correo) || empty($fecha)) {
         echo json_encode(["success" => false, "message" => "Faltan datos obligatorios"]);
         exit;
     }
 
-  
-    $stmt = $mysql->prepare("INSERT INTO agenda (Correo, Titulo, Descripcion, Fecha, Tipo) 
-                             VALUES (?, ?, ?, ?, ?)");
-
-    $stmt->bind_param("sssss", $correo, $titulo, $descripcion, $fecha, $tipo);
+    // Insertar en base de datos
+    $stmt = $mysql->prepare("INSERT INTO agenda (nombre_paciente, medico, hora, correo, fecha, titulo, descripcion, tipo) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("ssssssss", $nombre, $medico, $hora, $correo, $fecha, $titulo, $descripcion, $tipo);
 
     if ($stmt->execute()) {
-         $mensaje = "¡Registro guardado con exito!";
-      echo "<script>alert('$mensaje');</script>";
-       header("Location:Agenda.html");
-      
+        echo json_encode(["success" => true, "message" => "Cita agendada correctamente"]);
     } else {
-        echo json_encode(["success" => false, "message" => "Error al insertar cita: " . $stmt->error]);
+        echo json_encode(["success" => false, "message" => "Error al guardar la cita: " . $stmt->error]);
     }
 
     $stmt->close();
