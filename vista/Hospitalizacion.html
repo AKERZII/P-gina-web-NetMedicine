@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Hospitalización | Red Médica</title>
+  <link rel="stylesheet" href="./css/Principal.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { animation: fadeInPage 0.8s ease-in-out; }
+    @keyframes fadeInPage { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .container { max-width: 1000px; margin: 50px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 30px; }
+    .hero-img { width: 100%; border-radius: 12px; margin-bottom: 20px; }
+    h2 { margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <!-- ENCABEZADO -->
+  <header class="top-header">
+    <div class="logo"><img src="./img/Logo.jpg" alt="Logo Red Médica"></div>
+    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
+    <div class="login" id="loginArea"><a href="login.html" class="btn-login">Iniciar Sesión</a></div>
+    <script>
+      const usuarioActual = localStorage.getItem("usuarioActual");
+      if (usuarioActual) {
+        document.getElementById("loginArea").innerHTML = `
+          <p>Bienvenido, <strong>${usuarioActual}</strong></p>
+          <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>`;
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+          localStorage.removeItem("usuarioActual"); window.location.reload();
+        });
+      }
+    </script>
+  </header>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <ul class="menu">
+      <li><a href="./src/principal.html">Inicio</a></li>
+      <li><a href="Medicos.html">Hospitales & Médicos</a></li>
+      <li><a href="Agenda.html">Agenda</a></li>
+      <li><a href="Consultas.html">Consultas</a></li>
+      <li class="dropdown">
+        <a href="#">Servicios ▾</a>
+        <ul class="submenu">
+          <li><a href="Hospitalizacion.html">Hospitalización</a></li>
+          <li><a href="Laboratorio.html">Laboratorio Clínico</a></li>
+          <li><a href="Rehabilitacion.html">Rehabilitación</a></li>
+          <li><a href="SaludMental.html">Salud Mental</a></li>
+          <li><a href="Farmacia.html">Farmacia</a></li>
+          <li><a href="Urgencias.html">Urgencias</a></li>
+          <li><a href="Planificacion.html">Planificación Familiar</a></li>
+        </ul>
+      </li>
+      <li><a href="Recetas.html">Recetas</a></li>
+    </ul>
+  </nav>
+
+  <!-- CONTENIDO -->
+  <div class="container">
+    <h1 class="mb-4">Hospitalización</h1>
+    <img src="../img/hospital.jpg" alt="Área de hospitalización" class="hero-img">
+
+    <p>La <strong>hospitalización</strong> es el proceso mediante el cual un paciente permanece en un hospital para recibir atención médica continua. Puede ser necesaria por diversos motivos, como cirugías, tratamientos especializados o vigilancia médica prolongada.</p>
+
+    <h2>Aspectos generales</h2>
+    <p>En la mayoría de los hospitales, la hospitalización incluye:</p>
+    <ul>
+      <li>Habitaciones privadas o compartidas.</li>
+      <li>Supervisión médica y de enfermería constante.</li>
+      <li>Acceso a estudios y tratamientos especializados.</li>
+      <li>Espacios de visita para familiares.</li>
+    </ul>
+
+    <h2>Ingreso</h2>
+    <p>El ingreso a hospitalización suele requerir indicación médica y documentación básica del paciente. Dependiendo del hospital, pueden solicitar identificación oficial, historial clínico y autorización de un médico tratante.</p>
+
+    <h2>Visitas</h2>
+    <p>Los <strong>horarios de visita</strong> varían según cada hospital. Generalmente se establecen franjas durante el día para permitir la presencia de familiares, procurando mantener un ambiente tranquilo para la recuperación.</p>
+
+    <h2>Nota importante</h2>
+    <p><em>Red Médica no ofrece hospitalización directamente.</em> Nuestra función es conectar a los usuarios con hospitales y clínicas que sí cuentan con este servicio. Los detalles como horarios, políticas de ingreso y servicios adicionales pueden variar según el hospital elegido.</p>
+
+    <h2>Más información</h2>
+    <p>Si deseas conocer las políticas específicas de hospitalización, te recomendamos consultar directamente con el hospital de tu preferencia.</p>
+  </div>
+  <script src="./js/navbar.js"></script>
+</body>
+</html>

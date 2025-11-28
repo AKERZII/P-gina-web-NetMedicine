@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Rehabilitación | Red Médica</title>
+  <link rel="stylesheet" href="./css/Principal.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { animation: fadeInPage 0.8s ease-in-out; }
+    @keyframes fadeInPage { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .container { max-width: 1000px; margin: 50px auto; background: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 30px; }
+    .hero-img { width: 100%; border-radius: 12px; margin-bottom: 20px; }
+    h2 { margin-top: 28px; }
+  </style>
+</head>
+<body class="fade-in">
+  <header class="top-header">
+    <div class="logo"><img src="./img/Logo.jpg" alt="Logo Red Médica"></div>
+    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | contacto@redmedica.mx</p></div>
+    <div class="login" id="loginArea"><a href="./login.html" class="btn-login">Iniciar Sesión</a></div>
+  </header>
+
+  <nav class="navbar">
+    <ul class="menu">
+      <li><a href="./Principal.html">Inicio</a></li>
+      <li><a href="./Medicos.html">Hospitales & Médicos</a></li>
+      <li><a href="./Agenda.html">Agenda</a></li>
+      <li><a href="./Consultas.html">Consultas</a></li>
+      <li class="dropdown">
+        <a href="#">Servicios ▾</a>
+        <ul class="submenu">
+          <li><a href="./Hospitalizacion.html">Hospitalización</a></li>
+          <li><a href="./Laboratorio.html">Laboratorio Clínico</a></li>
+          <li><a href="./Rehabilitacion.html">Rehabilitación</a></li>
+          <li><a href="./SaludMental.html">Salud Mental</a></li>
+          <li><a href="./Farmacia.html">Farmacia</a></li>
+          <li><a href="./Urgencias.html">Urgencias</a></li>
+          <li><a href="./Planificacion.html">Planificación Familiar</a></li>
+        </ul>
+      </li>
+      <li><a href="./Recetas.html">Recetas</a></li>
+    </ul>
+  </nav>
+
+
+  <div class="container">
+    <h1 class="mb-4">Rehabilitación</h1>
+    <img src="./img/rehabilitacion.jpg" alt="Sesión de rehabilitación física" class="hero-img">
+
+    <p>La <strong>rehabilitación</strong> es un conjunto de estrategias y terapias destinadas a recuperar, mantener o mejorar habilidades físicas, cognitivas y sociales tras una lesión, enfermedad o procedimiento médico. Su objetivo principal es ayudar a las personas a alcanzar el mayor nivel posible de independencia y calidad de vida.</p>
+
+    <h2>Áreas comunes de la rehabilitación</h2>
+    <ul>
+      <li>Rehabilitación física: fortalecimiento muscular, movilidad articular, marcha, equilibrio.</li>
+      <li>Rehabilitación ocupacional: actividades de la vida diaria, adaptación del entorno, función de la mano.</li>
+      <li>Rehabilitación del lenguaje y deglución: terapia de habla, comunicación y funciones de alimentación.</li>
+      <li>Rehabilitación cardiaca y pulmonar: condicionamiento supervisado, educación y seguimiento.</li>
+      <li>Rehabilitación neurológica: post-ictus, lesión medular, enfermedades neurodegenerativas.</li>
+    </ul>
+
+    <h2>Evaluación y plan de trabajo</h2>
+    <p>Habitualmente se realiza una evaluación inicial para identificar necesidades y establecer objetivos. A partir de ello se define un <strong>plan personalizado</strong> con frecuencia de sesiones y ejercicios en casa, que se ajusta conforme evoluciona el paciente.</p>
+
+    <h2>Duración y frecuencia</h2>
+    <p>La duración de los procesos de rehabilitación varía según la condición, objetivos y respuesta al tratamiento. Algunas personas requieren programas cortos y otras planes prolongados con <em>revaluaciones periódicas</em>.</p>
+
+    <h2>Recomendaciones generales</h2>
+    <ul>
+      <li>Seguir las indicaciones del profesional de rehabilitación y asistir puntualmente.</li>
+      <li>Realizar los ejercicios domiciliarios según lo pautado.</li>
+      <li>Comunicar cualquier molestia o cambio en los síntomas.</li>
+      <li>Mantener una actitud paciente y constante: los avances suelen ser progresivos.</li>
+    </ul>
+
+    <h2>Nota importante</h2>
+    <p><em>Red Médica no ofrece rehabilitación directamente.</em> Nuestra función es conectar a los usuarios con hospitales, clínicas y profesionales que cuentan con estos servicios. Los <strong>horarios, políticas, costos y requisitos</strong> pueden variar según la institución elegida.</p>
+
+    <h2>Más información</h2>
+    <p>Para conocer detalles específicos (tipos de terapias disponibles, tiempos de espera, requisitos y costos), te recomendamos contactar directamente al hospital o clínica de tu preferencia.</p>
+  </div>
+
+  <script src="./js/navbar.js"></script>
+</body>
+</html>
