@@ -1,3 +1,11 @@
+<?php
+session_start();
+// Verificar si el usuario está logueado
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: ../login.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,6 +16,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 </head>
 <body class="fade-in">
+  
+ 
   <header class="top-header">
     <div class="logo">
       <img src="../img/Logo.jpg" alt="Red Médica - Logo" loading="lazy">
@@ -16,29 +26,40 @@
       <p>Tel: +52 (33) 1234 5678 | contacto@redmedica.mx</p>
     </div>
     <div class="login" id="loginArea">
-      <a href="../login.php" class="btn-login">Iniciar Sesión</a>
+       <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+        <div class="welcome">
+            <h1>¡Bienvenido, <?php echo $_SESSION['nombre']; ?>!</h1>
+            <p>Has iniciado sesión correctamente como: <?php echo $_SESSION['rol']?></p>
+            <a href="../../controlador/login.php"  class="btn-login">Cerrar Sesión</a>
+        </div>
+    <?php else: ?>
+        <div class="not-logged">
+            <p>No has iniciado sesión.</p>
+            <a href="../../controlador/login.php"  class="btn-login">Ir al Login</a>
+        </div>
+    <?php endif; ?>
     </div>
   </header>
 
   <nav class="navbar">
     <ul class="menu">
       <li><a href="../src/principal.php">Inicio</a></li>
-      <li><a href="../Medicos.html">Hospitales & Médicos</a></li>
-      <li><a href="../Agenda.html">Agenda</a></li>
-      <li><a href="../Consultas.html">Consultas</a></li>
+      <li><a href="../Medicos.php">Hospitales & Médicos</a></li>
+      <li><a href="../Agenda.php">Agenda</a></li>
+      <li><a href="../Consultas.php">Consultas</a></li>
       <li class="dropdown">
         <a href="#">Servicios ▾</a>
         <ul class="submenu">
-          <li><a href="../Hospitalizacion.html">Hospitalización</a></li>
-          <li><a href="../Laboratorio.html">Laboratorio Clínico</a></li>
-          <li><a href="../Rehabilitacion.html">Rehabilitación</a></li>
-          <li><a href="../SaludMental.html">Salud Mental</a></li>
-          <li><a href="../Farmacia.html">Farmacia</a></li>
-          <li><a href="../Urgencias.html">Urgencias</a></li>
-          <li><a href="../Planificacion.html">Planificación Familiar</a></li>
+          <li><a href="../Hospitalizacion.php">Hospitalización</a></li>
+          <li><a href="../Laboratorio.php">Laboratorio Clínico</a></li>
+          <li><a href="../Rehabilitacion.php">Rehabilitación</a></li>
+          <li><a href="../SaludMental.php">Salud Mental</a></li>
+          <li><a href="../Farmacia.php">Farmacia</a></li>
+          <li><a href="../Urgencias.php">Urgencias</a></li>
+          <li><a href="../Planificacion.php">Planificación Familiar</a></li>
         </ul>
       </li>
-      <li><a href="../Recetas.html">Recetas</a></li>
+      <li><a href="../Recetas.php">Recetas</a></li>
     </ul>
   </nav>
 
@@ -69,7 +90,7 @@
               <div class="card-body">
                 <h5 class="card-title">Médicos</h5>
                 <p class="card-text">Encuentra especialistas calificados en todas las áreas médicas.</p>
-                <a href="../Medicos.html" class="btn-learn">Ver Médicos</a>
+                <a href="../Medicos.php" class="btn-learn">Ver Médicos</a>
               </div>
             </div>
           </div>
@@ -79,7 +100,7 @@
               <div class="card-body">
                 <h5 class="card-title">Citas</h5>
                 <p class="card-text">Agenda tus consultas médicas de forma rápida y sencilla.</p>
-                <a href="../Agenda.html" class="btn-learn">Agendar Cita</a>
+                <a href="../Agenda.php" class="btn-learn">Agendar Cita</a>
               </div>
             </div>
           </div>
@@ -89,7 +110,7 @@
               <div class="card-body">
                 <h5 class="card-title">Recetas</h5>
                 <p class="card-text">Gestiona y consulta tus recetas médicas digitalmente.</p>
-                <a href="../Recetas.html" class="btn-learn">Ver Recetas</a>
+                <a href="../Recetas.php" class="btn-learn">Ver Recetas</a>
               </div>
             </div>
           </div>

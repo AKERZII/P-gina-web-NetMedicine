@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Obtener la página actual
-    const currentPage = window.location.pathname.split('/').pop() || 'Principal.html';
+    const currentPage = window.location.pathname.split('/').pop() || 'Principal.php';
     
     // Buscar y marcar como activo el enlace correspondiente
     const menuLinks = document.querySelectorAll('.navbar .menu a, .navbar .submenu a');
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById("logoutBtn").addEventListener("click", () => {
             localStorage.removeItem("usuarioActual");
             localStorage.removeItem("rolUsuario");
-            window.location.href = 'Principal.html';
+            window.location.href = 'Principal.php';
         });
 
         // Aplicar restricciones según el rol
@@ -54,8 +54,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (rol === 'medico') {
             // Ocultar elementos que el médico no puede ver
             const elementosRestringidos = [
-                'Medicos.html', // Gestión de médicos
-                'Usuarios.html' // Gestión de usuarios
+                'Medicos.php', // Gestión de médicos
+                'Usuarios.php' // Gestión de usuarios
             ];
             
             // Ocultar enlaces del menú
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 btn.style.display = 'none';
             });
 
-            // Ocultar pestañas de administración en Médicos.html
+            // Ocultar pestañas de administración en Médicos.php
             const hospitalesTab = document.getElementById('hospitales-tab');
             if (hospitalesTab) {
                 hospitalesTab.style.display = 'none';
@@ -111,14 +111,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // Función para verificar acceso a páginas específicas
 function verificarAccesoPagina(pagina, rol) {
     const paginasRestringidas = {
-        'Medicos.html': ['admin'],
-        'Usuarios.html': ['admin'],
-        'Reportes.html': ['admin']
+        //'Medicos.php': ['paciente'],
+        'Usuarios.php': ['admin'],
+        'Reportes.php': ['admin']
     };
 
     if (paginasRestringidas[pagina] && !paginasRestringidas[pagina].includes(rol)) {
         alert('No tienes permisos para acceder a esta página.');
-        window.location.href = 'Principal.html';
+        window.location.href = 'Principal.php';
         return;
     }
 }

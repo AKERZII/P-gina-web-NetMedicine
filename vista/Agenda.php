@@ -1,3 +1,21 @@
+<?php
+session_start();
+
+// Verificar si el usuario está logueado
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: login.php');
+    exit;
+}
+
+$userRole = $_SESSION['rol'] ?? 'paciente';
+$userName = $_SESSION['nombre'] ?? 'Usuario';
+
+// Permitir solo médicos y administradores
+if ($userRole !== 'medico' && $userRole !== 'administrador') {
+    header('Location: principal.php?error=sin_permiso');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -41,7 +59,7 @@
   <header class="top-header">
     <div class="logo"><img src="./img/Logo.jpg" alt="Logo"></div>
     <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
-    <div class="login" id="loginArea"><a href="./login.html" class="btn-login">Iniciar Sesión</a></div>
+    <div class="login" id="loginArea"><a href="./login.php" class="btn-login">Iniciar Sesión</a></div>
     <script>
       const usuarioActual = localStorage.getItem("usuarioActual");
       const rolUsuario = localStorage.getItem("rolUsuario");
@@ -62,23 +80,23 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <ul class="menu">
-      <li><a href="./src/principal.html">Inicio</a></li>
-      <li><a href="./Medicos.html">Hospitales & Médicos</a></li>
-      <li><a href="./Agenda.html">Agenda</a></li>
-      <li><a href="./Consultas.html">Consultas</a></li>
+      <li><a href="./src/principal.php">Inicio</a></li>
+      <li><a href="./Medicos.php">Hospitales & Médicos</a></li>
+      <li><a href="./Agenda.php">Agenda</a></li>
+      <li><a href="./Consultas.php">Consultas</a></li>
       <li class="dropdown">
         <a href="">Servicios ▾</a>
         <ul class="submenu">
-          <li><a href="./Hospitalizacion.html">Hospitalización</a></li>
-          <li><a href="./Laboratorio.html">Laboratorio Clínico</a></li>
-          <li><a href="./Rehabilitacion.html">Rehabilitación</a></li>
-          <li><a href="./SaludMental.html">Salud Mental</a></li>
-          <li><a href="./Farmacia.html">Farmacia</a></li>
-          <li><a href="./Urgencias.html">Urgencias</a></li>
-          <li><a href="./Planificacion.html">Planificación Familiar</a></li>
+          <li><a href="./Hospitalizacion.php">Hospitalización</a></li>
+          <li><a href="./Laboratorio.php">Laboratorio Clínico</a></li>
+          <li><a href="./Rehabilitacion.php">Rehabilitación</a></li>
+          <li><a href="./SaludMental.php">Salud Mental</a></li>
+          <li><a href="./Farmacia.php">Farmacia</a></li>
+          <li><a href="./Urgencias.php">Urgencias</a></li>
+          <li><a href="./Planificacion.php">Planificación Familiar</a></li>
         </ul>
       </li>
-      <li><a href="./Recetas.html">Recetas</a></li>
+      <li><a href="./Recetas.php">Recetas</a></li>
     </ul>
   </nav>
 
@@ -555,10 +573,10 @@ Descripción: ${props.descripcion}
     });
   </script>
   <script src="./js/navbar.js"></script>
-  <!-- Agregar este script en Agenda.html, después de la inicialización del calendario -->
+  <!-- Agregar este script en Agenda.php, después de la inicialización del calendario -->
 
 <script>
-// Control de acceso y personalización para Agenda.html
+// Control de acceso y personalización para Agenda.php
 document.addEventListener('DOMContentLoaded', function() {
     const rolUsuario = localStorage.getItem('rolUsuario');
     const medicoActual = localStorage.getItem('usuarioActual');

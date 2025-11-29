@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Redirigir después de breve delay
                 setTimeout(() => {
-                    window.location.href = 'principal.html';
+                    window.location.href = 'principal.php';
                 }, 1000);
 
             } else {
@@ -167,7 +167,7 @@ registerForm.addEventListener('submit', async (e) => {
 
     // Verificar si ya está logueado
     const usuarioActual = localStorage.getItem('usuarioActual');
-    if (usuarioActual && window.location.pathname.includes('login.html')) {
-        window.location.href = 'principal.html';
+    if (usuarioActual && window.location.pathname.includes('login.php')) {
+        window.location.href = 'principal.php';
     }
 });

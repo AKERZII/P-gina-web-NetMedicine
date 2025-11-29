@@ -19,7 +19,7 @@
   <header class="top-header">
     <div class="logo"><img src="./img/Logo.jpg" alt="Logo"></div>
     <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
-    <div class="login" id="loginArea"><a href="login.html" class="btn-login">Iniciar Sesión</a></div>
+    <div class="login" id="loginArea"><a href="login.php" class="btn-login">Iniciar Sesión</a></div>
     <script>
       const usuarioActual = localStorage.getItem("usuarioActual");
       const rol = localStorage.getItem("rolUsuario");
@@ -39,23 +39,23 @@
   <!-- NAVBAR -->
    <nav class="navbar">
     <ul class="menu">
-      <li><a href="Principal.html">Inicio</a></li>
-      <li><a href="Medicos.html">Hospitales & Médicos</a></li>
-      <li><a href="Agenda.html">Agenda</a></li>
-      <li><a href="Consultas.html">Consultas</a></li>
+      <li><a href="Principal.php">Inicio</a></li>
+      <li><a href="Medicos.php">Hospitales & Médicos</a></li>
+      <li><a href="Agenda.php">Agenda</a></li>
+      <li><a href="Consultas.php">Consultas</a></li>
       <li class="dropdown">
         <a href="#">Servicios</a>
         <ul class="submenu" id="submenuServicios">
-          <li><a href="Hospitalizacion.html">Hospitalización</a></li>
-          <li><a href="Laboratorio.html">Laboratorio Clínico</a></li>
-          <li><a href="Rehabilitacion.html">Rehabilitación</a></li>
-          <li><a href="SaludMental.html">Salud Mental</a></li>
-          <li><a href="Farmacia.html">Farmacia</a></li>
-          <li><a href="Urgencias.html">Urgencias</a></li>
-          <li><a href="Planificacion.html">Planificación Familiar</a></li>
+          <li><a href="Hospitalizacion.php">Hospitalización</a></li>
+          <li><a href="Laboratorio.php">Laboratorio Clínico</a></li>
+          <li><a href="Rehabilitacion.php">Rehabilitación</a></li>
+          <li><a href="SaludMental.php">Salud Mental</a></li>
+          <li><a href="Farmacia.php">Farmacia</a></li>
+          <li><a href="Urgencias.php">Urgencias</a></li>
+          <li><a href="Planificacion.php">Planificación Familiar</a></li>
         </ul>
       </li>
-      <li><a href="Recetas.html">Recetas</a></li>
+      <li><a href="Recetas.php">Recetas</a></li>
     </ul>
   </nav>
 
@@ -339,6 +339,7 @@
     </div>
   </div>
 
+  <script src="../js/navbar.js"></script>
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
@@ -673,7 +674,7 @@
             <td>${formatearHorario(medico)}</td>
             <td>${formatearDiasTrabajo(medico.diasTrabajo)}</td>
             <td>
-              <a href="./Doctores/${medico.id.replace('m_', 'doctor')}.html" class="btn btn-outline-primary btn-sm">
+              <a href="./Doctores/${medico.id.replace('m_', 'doctor')}.php" class="btn btn-outline-primary btn-sm">
                 Ver perfil
               </a>
             </td>
@@ -981,7 +982,7 @@
   </script>
   <script src="./js/navbar.js"></script>
   <script>
-// Control de acceso específico para Médicos.html
+// Control de acceso específico para Médicos.php
 document.addEventListener('DOMContentLoaded', function() {
     const rolUsuario = localStorage.getItem('rolUsuario');
     

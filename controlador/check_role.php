@@ -3,22 +3,33 @@ session_start();
 header('Content-Type: application/json');
 
 function checkRole($requiredRole) {
-    $userRole = $_SESSION['rol'] ?? '';
+    // Verificar si la sesión está activa y tiene rol
+    if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+        return json_encode([
+            "authorized" => false, 
+            "message" => "No autenticado",
+            "redirect" => "../vista/login.php"
+        ]);
+    }
+    
+    $userRole = $_SESSION['rol'] ?? 'paciente';
     
     if (empty($userRole)) {
-        // Intentar obtener del localStorage via JavaScript
-        echo json_encode(["authorized" => false, "message" => "No autenticado"]);
-        exit;
+        return json_encode([
+            "authorized" => false, 
+            "message" => "Rol no definido",
+            "redirect" => "../vista/login.php"
+        ]);
     }
     
     $authorized = false;
     
     switch($requiredRole) {
-        case 'admin':
-            $authorized = ($userRole === 'admin');
+        case 'administrador':
+            $authorized = ($userRole === 'administrador');
             break;
         case 'medico':
-            $authorized = ($userRole === 'medico' || $userRole === 'admin');
+            $authorized = ($userRole === 'medico' || $userRole === 'administrador');
             break;
         case 'paciente':
             $authorized = true; // Todos los roles pueden acceder
@@ -27,7 +38,20 @@ function checkRole($requiredRole) {
             $authorized = false;
     }
     
-    return json_encode(["authorized" => $authorized, "role" => $userRole]);
+    return [
+        "authorized" => $authorized, 
+        "role" => $userRole,
+        "required" => $requiredRole
+    ];
 }
 
+// Para uso directo via GET/POST
+if (isset($_GET['required_role'])) {
+    $result = checkRole($_GET['required_role']);
+    echo json_encode($result);
+    exit;
+}
+
+// Para uso en otros archivos PHP
+return true;
 ?>
