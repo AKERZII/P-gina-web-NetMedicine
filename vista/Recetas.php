@@ -8,11 +8,10 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 }
 
 $userRole = $_SESSION['rol'] ?? 'paciente';
-$userName = $_SESSION['nombre'] ?? 'Usuario';
 
-// Permitir solo médicos
-if ($userRole !== 'medico') {
-    header('Location: principal.php?error=sin_permiso');
+// Permitir solo médicos y administradores
+if ($userRole !== 'medico' && $userRole !== 'administrador') {
+    header('Location: ./src/principal.php');
     exit;
 }
 ?>
@@ -48,12 +47,12 @@ if ($userRole !== 'medico') {
         <div class="welcome">
             <h1>¡Bienvenido, <?php echo $_SESSION['nombre']; ?>!</h1>
             <p>Has iniciado sesión correctamente como: <?php echo $_SESSION['rol']?></p>
-            <a href="../../controlador/logout.php"  class="btn-login">Cerrar Sesión</a>
+            <a href="../controlador/logout.php"  class="btn-login">Cerrar Sesión</a>
         </div>
     <?php else: ?>
         <div class="not-logged">
             <p>No has iniciado sesión.</p>
-            <a href="../../controlador/login.php"  class="btn-login">Iniciar sesión</a>
+            <a href="../controlador/login.php"  class="btn-login">Iniciar sesión</a>
         </div>
     <?php endif; ?>
     </div>
@@ -137,46 +136,46 @@ if ($userRole !== 'medico') {
       </div>
 
       <!-- Medicamentos -->
-      <div class="row mb-4">
-        <div class="col-12">
-          <h5>Medicamentos Prescritos</h5>
-          <div id="medicamentos-container">
-            <!-- Primer medicamento -->
-            <div class="medicamento-item border p-3 mb-3 rounded">
-              <div class="row">
-                <div class="col-md-4">
-                  <label class="form-label">Medicamento</label>
-                  <input type="text" class="form-control medicamento-nombre" list="lista-medicamentos" placeholder="Paracetamol" required>
-                </div>
-                <div class="col-md-2">
-                  <label class="form-label">Cantidad</label>
-                  <input type="text" class="form-control medicamento-cantidad" placeholder="1 tableta" required>
-                </div>
-                <div class="col-md-3">
-                  <label class="form-label">Frecuencia</label>
-                  <input type="text" class="form-control medicamento-frecuencia" placeholder="Cada 8 horas" required>
-                </div>
-                <div class="col-md-3">
-                  <label class="form-label">Duración</label>
-                  <input type="text" class="form-control medicamento-duracion" placeholder="7 días" required>
-                </div>
-              </div>
-              <div class="row mt-2">
-                <div class="col-12">
-                  <label class="form-label">Instrucciones especiales</label>
-                  <input type="text" class="form-control medicamento-instrucciones" placeholder="Tomar después de los alimentos">
-                  <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="eliminarMedicamento(this)">
-                    Eliminar Medicamento
-                  </button>
-                </div>
-              </div>
+      <!-- En el formulario de Recetas.php, modifica los campos de medicamentos así: -->
+<div id="medicamentos-container">
+    <!-- Primer medicamento -->
+    <div class="medicamento-item border p-3 mb-3 rounded">
+        <div class="row">
+            <div class="col-md-4">
+                <label class="form-label">Medicamento</label>
+                <input type="text" name="medicamento_0_nombre" class="form-control medicamento-nombre" list="lista-medicamentos" placeholder="Paracetamol" required>
             </div>
-          </div>
-          <button type="button" class="btn btn-outline-primary btn-sm" onclick="agregarMedicamento()">
-            Agregar otro medicamento
-          </button>
+            <div class="col-md-2">
+                <label class="form-label">Cantidad</label>
+                <input type="text" name="medicamento_0_cantidad" class="form-control medicamento-cantidad" placeholder="1 tableta" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Frecuencia</label>
+                <input type="text" name="medicamento_0_frecuencia" class="form-control medicamento-frecuencia" placeholder="Cada 8 horas" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Duración</label>
+                <input type="text" name="medicamento_0_duracion" class="form-control medicamento-duracion" placeholder="7 días" required>
+            </div>
         </div>
-      </div>
+        <div class="row mt-2">
+            <div class="col-12">
+                <label class="form-label">Instrucciones especiales</label>
+                <input type="text" name="medicamento_0_instrucciones" class="form-control medicamento-instrucciones" placeholder="Tomar después de los alimentos">
+                <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="eliminarMedicamento(this)">
+                    Eliminar Medicamento
+                </button>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="agregarMedicamento()">
+    + Agregar otro medicamento
+    </button>
+</div>
+
+<input type="hidden" name="fechaPrescripcionHidden" id="fechaPrescripcionHidden">
+<input type="hidden" name="lugarExpedicionHidden" id="lugarExpedicionHidden">
+<input type="hidden" name="instruccionesAdicionalesHidden" id="instruccionesAdicionalesHidden">
 
       <!-- Instrucciones adicionales -->
       <div class="mb-4">

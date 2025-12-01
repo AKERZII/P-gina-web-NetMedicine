@@ -1,4 +1,14 @@
 // Establecer fecha actual por defecto y configurar validación
+function actualizarHiddenFields() {
+    document.getElementById('fechaPrescripcionHidden').value = document.getElementById('fechaPrescripcion').value;
+    document.getElementById('lugarExpedicionHidden').value = document.getElementById('lugarExpedicion').value;
+    document.getElementById('instruccionesAdicionalesHidden').value = document.getElementById('instruccionesAdicionales').value;
+}
+
+// Llamar esta función antes de enviar el formulario
+document.getElementById('receta-form').addEventListener('submit', function(e) {
+    actualizarHiddenFields();
+});
 function configurarFechaPrescripcion() {
     const fechaInput = document.getElementById('fechaPrescripcion');
     if (!fechaInput) return;
@@ -41,85 +51,10 @@ function validarFechaPrescripcion(fechaSeleccionada) {
 
 // Inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
-    // Cargar médicos disponibles
-    cargarMedicosDisponibles();
-    
     // Configurar fecha de prescripción
     configurarFechaPrescripcion();
 });
 
-// Contador para medicamentos
-let contadorMedicamentos = 1;
-
-// Función para agregar más medicamentos
-function agregarMedicamento() {
-    contadorMedicamentos++;
-    const container = document.getElementById('medicamentos-container');
-    
-    const nuevoMedicamento = document.createElement('div');
-    nuevoMedicamento.className = 'medicamento-item border p-3 mb-3 rounded';
-    nuevoMedicamento.innerHTML = `
-        <div class="row">
-            <div class="col-md-4">
-                <label class="form-label">Medicamento</label>
-                <input type="text" class="form-control medicamento-nombre" list="lista-medicamentos" placeholder="Paracetamol" required>
-            </div>
-            <div class="col-md-2">
-                <label class="form-label">Cantidad</label>
-                <input type="text" class="form-control medicamento-cantidad" placeholder="1 tableta" required>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Frecuencia</label>
-                <input type="text" class="form-control medicamento-frecuencia" placeholder="Cada 8 horas" required>
-            </div>
-            <div class="col-md-3">
-                <label class="form-label">Duración</label>
-                <input type="text" class="form-control medicamento-duracion" placeholder="7 días" required>
-            </div>
-        </div>
-        <div class="row mt-2">
-            <div class="col-12">
-                <label class="form-label">Instrucciones especiales</label>
-                <input type="text" class="form-control medicamento-instrucciones" placeholder="Tomar después de los alimentos">
-                <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="eliminarMedicamento(this)">
-                    Eliminar
-                </button>
-            </div>
-        </div>
-    `;
-    
-    container.appendChild(nuevoMedicamento);
-}
-
-// Función para eliminar medicamento
-function eliminarMedicamento(boton) {
-    if (contadorMedicamentos > 1) {
-        const item = boton.closest('.medicamento-item');
-        item.remove();
-        contadorMedicamentos--;
-    } else {
-        alert('Debe haber al menos un medicamento en la receta.');
-    }
-}
-
-// Función para recolectar datos de medicamentos
-function obtenerDatosMedicamentos() {
-    const medicamentos = [];
-    const items = document.querySelectorAll('.medicamento-item');
-    
-    items.forEach(item => {
-        const medicamento = {
-            nombre: item.querySelector('.medicamento-nombre').value,
-            cantidad: item.querySelector('.medicamento-cantidad').value,
-            frecuencia: item.querySelector('.medicamento-frecuencia').value,
-            duracion: item.querySelector('.medicamento-duracion').value,
-            instrucciones: item.querySelector('.medicamento-instrucciones').value
-        };
-        medicamentos.push(medicamento);
-    });
-    
-    return medicamentos;
-}
 
 // Previsualizar receta
 function previsualizarReceta() {
@@ -266,7 +201,10 @@ function formatearFecha(fechaISO) {
 }
 
 
-// Función para agregar más medicamentos
+// En Recetas.js - versión corregida
+let contadorMedicamentos = 1;
+
+// Función para agregar medicamento
 function agregarMedicamento() {
     contadorMedicamentos++;
     const container = document.getElementById('medicamentos-container');
@@ -274,31 +212,30 @@ function agregarMedicamento() {
     const nuevoMedicamento = document.createElement('div');
     nuevoMedicamento.className = 'medicamento-item border p-3 mb-3 rounded';
     nuevoMedicamento.innerHTML = `
-        <input type="hidden" name="medicamento_index[]" value="${contadorMedicamentos}">
         <div class="row">
             <div class="col-md-4">
-                <label class="form-label">Medicamento</label>
-                <input type="text" name="medicamento_nombre_${contadorMedicamentos}" class="form-control medicamento-nombre" list="lista-medicamentos" placeholder="Paracetamol" required>
+                <label class="form-label">Medicamento *</label>
+                <input type="text" name="medicamento_${contadorMedicamentos}_nombre" class="form-control medicamento-nombre" placeholder="Paracetamol" required>
             </div>
             <div class="col-md-2">
-                <label class="form-label">Cantidad</label>
-                <input type="text" name="medicamento_cantidad_${contadorMedicamentos}" class="form-control medicamento-cantidad" placeholder="1 tableta" required>
+                <label class="form-label">Cantidad *</label>
+                <input type="text" name="medicamento_${contadorMedicamentos}_cantidad" class="form-control medicamento-cantidad" placeholder="1 tableta" required>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Frecuencia</label>
-                <input type="text" name="medicamento_frecuencia_${contadorMedicamentos}" class="form-control medicamento-frecuencia" placeholder="Cada 8 horas" required>
+                <label class="form-label">Frecuencia *</label>
+                <input type="text" name="medicamento_${contadorMedicamentos}_frecuencia" class="form-control medicamento-frecuencia" placeholder="Cada 8 horas" required>
             </div>
             <div class="col-md-3">
-                <label class="form-label">Duración</label>
-                <input type="text" name="medicamento_duracion_${contadorMedicamentos}" class="form-control medicamento-duracion" placeholder="7 días" required>
+                <label class="form-label">Duración *</label>
+                <input type="text" name="medicamento_${contadorMedicamentos}_duracion" class="form-control medicamento-duracion" placeholder="7 días" required>
             </div>
         </div>
         <div class="row mt-2">
             <div class="col-12">
                 <label class="form-label">Instrucciones especiales</label>
-                <input type="text" name="medicamento_instrucciones_${contadorMedicamentos}" class="form-control medicamento-instrucciones" placeholder="Tomar después de los alimentos">
+                <input type="text" name="medicamento_${contadorMedicamentos}_instrucciones" class="form-control medicamento-instrucciones" placeholder="Tomar después de los alimentos">
                 <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="eliminarMedicamento(this)">
-                    Eliminar
+                    Eliminar Medicamento
                 </button>
             </div>
         </div>
@@ -307,24 +244,79 @@ function agregarMedicamento() {
     container.appendChild(nuevoMedicamento);
 }
 
-// Configurar fecha actual al cargar la página
-document.addEventListener('DOMContentLoaded', function() {
-    const fechaInput = document.getElementById('fechaPrescripcion');
-    if (fechaInput) {
-        const hoy = new Date().toISOString().split('T')[0];
-        fechaInput.value = hoy;
-        fechaInput.min = hoy;
-    }
-});
-
 // Función para eliminar medicamento
 function eliminarMedicamento(boton) {
-    if (contadorMedicamentos > 1) {
+    const container = document.getElementById('medicamentos-container');
+    const items = container.querySelectorAll('.medicamento-item');
+    
+    if (items.length > 1) {
         const item = boton.closest('.medicamento-item');
         item.remove();
-        contadorMedicamentos--;
+        // Recontar medicamentos después de eliminar
+        contadorMedicamentos = container.querySelectorAll('.medicamento-item').length;
     } else {
         alert('Debe haber al menos un medicamento en la receta.');
     }
 }
 
+// Actualizar campos hidden antes de enviar
+function actualizarHiddenFields() {
+    const fechaPrescripcion = document.getElementById('fechaPrescripcion');
+    const lugarExpedicion = document.getElementById('lugarExpedicion');
+    const instruccionesAdicionales = document.getElementById('instruccionesAdicionales');
+    
+    if (fechaPrescripcion) {
+        document.getElementById('fechaPrescripcionHidden').value = fechaPrescripcion.value;
+    }
+    if (lugarExpedicion) {
+        document.getElementById('lugarExpedicionHidden').value = lugarExpedicion.value;
+    }
+    if (instruccionesAdicionales) {
+        document.getElementById('instruccionesAdicionalesHidden').value = instruccionesAdicionales.value;
+    }
+}
+
+// Configurar al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar fecha
+    configurarFechaPrescripcion();
+    
+    // Agregar event listener para el formulario
+    const form = document.getElementById('receta-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            actualizarHiddenFields();
+            
+            // Validación adicional antes de enviar
+            if (!validarFormulario()) {
+                e.preventDefault();
+                alert('Por favor, complete todos los campos obligatorios correctamente.');
+            }
+        });
+    }
+});
+
+// Validar formulario completo
+function validarFormulario() {
+    const nombrePaciente = document.getElementById('nombrePaciente').value.trim();
+    const correoPaciente = document.getElementById('correoPaciente').value.trim();
+    const fechaPrescripcion = document.getElementById('fechaPrescripcion').value;
+    
+    if (!nombrePaciente || !correoPaciente || !fechaPrescripcion) {
+        return false;
+    }
+    
+    // Validar que haya al menos un medicamento completo
+    const medicamentos = document.querySelectorAll('.medicamento-item');
+    let medicamentosValidos = 0;
+    
+    medicamentos.forEach(item => {
+        const nombre = item.querySelector('.medicamento-nombre').value.trim();
+        const cantidad = item.querySelector('.medicamento-cantidad').value.trim();
+        if (nombre && cantidad) {
+            medicamentosValidos++;
+        }
+    });
+    
+    return medicamentosValidos > 0;
+}

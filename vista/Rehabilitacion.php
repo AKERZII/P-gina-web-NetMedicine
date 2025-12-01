@@ -17,7 +17,18 @@
   <header class="top-header">
     <div class="logo"><img src="./img/Logo.jpg" alt="Logo Red Médica"></div>
     <div class="contacto"><p>Tel: +52 (33) 1234 5678 | contacto@redmedica.mx</p></div>
-    <div class="login" id="loginArea"><a href="./login.php" class="btn-login">Iniciar Sesión</a></div>
+    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+        <div class="welcome">
+            <h1>¡Bienvenido, <?php echo $_SESSION['nombre']; ?>!</h1>
+            <p>Has iniciado sesión correctamente como: <?php echo $_SESSION['rol']?></p>
+            <a href="../controlador/login.php"  class="btn-login">Cerrar Sesión</a>
+        </div>
+    <?php else: ?>
+        <div class="not-logged">
+            <p>No has iniciado sesión.</p>
+            <a href="../controlador/login.php"  class="btn-login">Ir al Login</a>
+        </div>
+    <?php endif; ?>
   </header>
 
   <nav class="navbar">

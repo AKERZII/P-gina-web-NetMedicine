@@ -1,10 +1,27 @@
+<?php
+session_start();
+
+// Verificar si el usuario está logueado
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: login.php');
+    exit;
+}
+
+$userRole = $_SESSION['rol'] ?? 'paciente';
+
+// Permitir solo médicos y administradores
+if ($userRole !== 'medico' && $userRole !== 'administrador') {
+    header('Location: ./medicosPublic.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <title>Directorio Médico | Red Médica</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="./css/Principal.css">
+  <link rel="stylesheet" href="../css/Principal.css">
    <style>
     body { animation: fadeInPage 0.8s ease-in-out; }
     @keyframes fadeInPage { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -20,20 +37,18 @@
     <div class="logo"><img src="./img/Logo.jpg" alt="Logo"></div>
     <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
     <div class="login" id="loginArea"><a href="login.php" class="btn-login">Iniciar Sesión</a></div>
-    <script>
-      const usuarioActual = localStorage.getItem("usuarioActual");
-      const rol = localStorage.getItem("rolUsuario");
-      if (usuarioActual) {
-        document.getElementById("loginArea").innerHTML = `
-          <p>Bienvenido, <strong>${usuarioActual}</strong> (${rol || 'sin rol'})</p>
-          <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>`;
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-          localStorage.removeItem("usuarioActual");
-          localStorage.removeItem("rolUsuario");
-          window.location.reload();
-        });
-      }
-    </script>
+    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+        <div class="welcome">
+            <h1>¡Bienvenido, <?php echo $_SESSION['nombre']; ?>!</h1>
+            <p>Has iniciado sesión correctamente como: <?php echo $_SESSION['rol']?></p>
+            <a href="../controlador/login.php"  class="btn-login">Cerrar Sesión</a>
+        </div>
+    <?php else: ?>
+        <div class="not-logged">
+            <p>No has iniciado sesión.</p>
+            <a href="../controlador/login.php"  class="btn-login">Ir al Login</a>
+        </div>
+    <?php endif; ?>
   </header>
 
   <!-- NAVBAR -->

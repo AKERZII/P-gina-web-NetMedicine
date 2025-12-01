@@ -42,7 +42,7 @@ try {
     $pdo->beginTransaction();
 
     // Insertar en tabla usuario
-    $sqlUsuario = "INSERT INTO usuario (nombre, correo, telefono, password, rol) 
+    $sqlUsuario = "INSERT INTO usuario (nombre, correo, password, telefono, rol) 
                    VALUES (?, ?, ?, ?, ?)";
     $stmtUsuario = $pdo->prepare($sqlUsuario);
     
@@ -52,28 +52,6 @@ try {
     $stmtUsuario->execute([$nombreCompleto, $correo, $telefono, $passwordHash, $rol]);
     $id_usuario = $pdo->lastInsertId();
 
-   
-    // Insertar en tabla específica según el rol
-    switch($rol) {
-        case 'paciente':
-            $sqlPaciente = "INSERT INTO paciente (id_usuario, nombre, telefono) VALUES (?, ?, ?)";
-            $stmtPaciente = $pdo->prepare($sqlPaciente);
-            $stmtPaciente->execute([$id_usuario, $nombreCompleto, $telefono]);
-            break;
-            
-        case 'medico':
-            $sqlMedico = "INSERT INTO medico (id_usuario, nombre, especialidad, cedula) VALUES (?, ?, ?, ?)";
-            $stmtMedico = $pdo->prepare($sqlMedico);
-            // Puedes solicitar estos datos en el formulario o establecer valores por defecto
-            $stmtMedico->execute([$id_usuario, $nombreCompleto, 'General', '']);
-            break;
-            
-        case 'administrador':
-            $sqlAdmin = "INSERT INTO administrador (id_usuario) VALUES (?)";
-            $stmtAdmin = $pdo->prepare($sqlAdmin);
-            $stmtAdmin->execute([$id_usuario]);
-            break;
-    }
 
     // Confirmar transacción
     $pdo->commit();
@@ -84,7 +62,9 @@ try {
 } catch(PDOException $e) {
     // Revertir transacción en caso de error
     $pdo->rollBack();
+    
     error_log("Error en registro: " . $e->getMessage());
+
     header('Location: ../vista/login.php?success=false&message=' . urlencode('Error en el registro. Intenta nuevamente.'));
     exit;
 }
