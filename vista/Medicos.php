@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once '../modelo/Conexion.php';
 
 // Verificar si el usuario está logueado
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
@@ -7,1027 +8,396 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     exit;
 }
 
-$userRole = $_SESSION['rol'] ?? 'paciente';
-
-// Permitir solo médicos y administradores
-if ($userRole !== 'medico' && $userRole !== 'administrador') {
-    header('Location: ./medicosPublic.php');
-    exit;
+// Obtener médicos de la base de datos con información de hospital
+try {
+    $query = "
+       SELECT
+        m.id_medico,
+        m.especialidad, 
+        m.horario, h.ubicacion as hospital_direccion, 
+        u.nombre as usuario_nombre 
+        FROM medico m LEFT JOIN hospital h ON m.id_hospital = h.id_hospital 
+        LEFT JOIN usuario u ON m.id_usuario = u.id_usuario 
+        WHERE m.activo = 1;
+    ";
+    
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
+    $medicos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+} catch (PDOException $e) {
+    $error_medicos = "Error al cargar médicos: " . $e->getMessage();
+    $medicos = [];
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Directorio Médico | Red Médica</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="../css/Principal.css">
-   <style>
-    body { animation: fadeInPage 0.8s ease-in-out; }
-    @keyframes fadeInPage { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .container { margin-top: 50px; }
-    .dias-trabajo { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
-    .dia-checkbox { display: flex; align-items: center; margin-right: 15px; }
-    .dia-checkbox input { margin-right: 5px; }
-  </style>
+    <meta charset="UTF-8">
+    <title>Médicos | Red Médica</title>
+
+    <link rel="stylesheet" href="./css/Principal.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', sans-serif;
+            animation: fadeInPage 0.8s ease-in-out;
+        }
+        @keyframes fadeInPage {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .card img {
+            height: 220px;
+            object-fit: cover;
+        }
+        .card {
+            border-radius: 12px;
+            transition: transform .2s, box-shadow .2s;
+            height: 100%;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+        }
+        .btn-ver {
+            background-color: #007bff;
+            border: none;
+            border-radius: 30px;
+            padding: 7px 18px;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-ver:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+        .especialidad-badge {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin: 5px 0;
+            display: inline-block;
+        }
+        .horario-info {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
+        .horario-info i {
+            color: #4CAF50;
+            margin-right: 5px;
+        }
+        .hospital-info {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 5px;
+        }
+        .hospital-info i {
+            color: #f57c00;
+            margin-right: 5px;
+        }
+        .no-image {
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #757575;
+            font-size: 3em;
+        }
+        .search-container {
+            max-width: 500px;
+            margin: 0 auto 30px;
+        }
+        .filter-buttons {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .filter-btn {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 5px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .filter-btn:hover {
+            background-color: #e9ecef;
+        }
+        .medico-count {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+        }
+    </style>
 </head>
+
 <body>
-  <!-- ENCABEZADO -->
-  <header class="top-header">
-    <div class="logo"><img src="./img/Logo.jpg" alt="Logo"></div>
+
+<!-- Encabezado -->
+<header class="top-header">
+    <div class="logo"><img src="./img/Logo.jpg" alt="Logo Red Médica"></div>
     <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
-    <div class="login" id="loginArea"><a href="login.php" class="btn-login">Iniciar Sesión</a></div>
-    <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+
+    <div class="login" id="loginArea">
+        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
         <div class="welcome">
-            <h1>¡Bienvenido, <?php echo $_SESSION['nombre']; ?>!</h1>
-            <p>Has iniciado sesión correctamente como: <?php echo $_SESSION['rol']?></p>
-            <a href="../controlador/login.php"  class="btn-login">Cerrar Sesión</a>
+            <h1>¡Bienvenido, <?php echo htmlspecialchars($_SESSION['nombre']); ?>!</h1>
+            <p>Has iniciado sesión correctamente como: <?php echo htmlspecialchars($_SESSION['rol']); ?></p>
+            <a href="../controlador/login.php" class="btn-login">Cerrar Sesión</a>
         </div>
-    <?php else: ?>
+        <?php else: ?>
         <div class="not-logged">
             <p>No has iniciado sesión.</p>
-            <a href="../controlador/login.php"  class="btn-login">Ir al Login</a>
+            <a href="../controlador/login.php" class="btn-login">Ir al Login</a>
         </div>
-    <?php endif; ?>
-  </header>
+        <?php endif; ?>
+    </div>
+</header>
 
-  <!-- NAVBAR -->
-   <nav class="navbar">
+<!-- NAVBAR -->
+<nav class="navbar">
     <ul class="menu">
-      <li><a href="Principal.php">Inicio</a></li>
-      <li><a href="Medicos.php">Hospitales & Médicos</a></li>
-      <li><a href="Agenda.php">Agenda</a></li>
-      <li><a href="Consultas.php">Consultas</a></li>
-      <li class="dropdown">
-        <a href="#">Servicios</a>
-        <ul class="submenu" id="submenuServicios">
-          <li><a href="Hospitalizacion.php">Hospitalización</a></li>
-          <li><a href="Laboratorio.php">Laboratorio Clínico</a></li>
-          <li><a href="Rehabilitacion.php">Rehabilitación</a></li>
-          <li><a href="SaludMental.php">Salud Mental</a></li>
-          <li><a href="Farmacia.php">Farmacia</a></li>
-          <li><a href="Urgencias.php">Urgencias</a></li>
-          <li><a href="Planificacion.php">Planificación Familiar</a></li>
-        </ul>
-      </li>
-      <li><a href="Recetas.php">Recetas</a></li>
+        <li><a href="./src/Principal.php">Inicio</a></li>
+        <li><a href="./Medicos.php">Médicos</a></li>
+        <li><a href="./Agenda.php">Agenda</a></li>
+        <li><a href="./Consultas.php">Consultas</a></li>
+
+        <li class="dropdown">
+            <a href="#">Servicios ▾</a>
+            <ul class="submenu">
+                <li><a href="./Consultas.php">Consultas</a></li>
+                <li><a href="./Hospitalizacion.php">Hospitalización</a></li>
+                <li><a href="./Laboratorio.php">Laboratorio Clínico</a></li>
+                <li><a href="./Rehabilitacion.php">Rehabilitación</a></li>
+                <li><a href="./SaludMental.php">Salud Mental</a></li>
+                <li><a href="./Farmacia.php">Farmacia</a></li>
+                <li><a href="./Urgencias.php">Urgencias</a></li>
+                <li><a href="./Planificacion.php">Planificación Familiar</a></li>
+            </ul>
+        </li>
     </ul>
-  </nav>
+</nav>
 
-
-  <!-- CONTENIDO -->
-  <div class="container py-5">
-    <h1 class="mb-4">Directorio Médico</h1>
+<!-- Contenedor principal -->
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Nuestros Médicos Especialistas</h2>
     
-    <!-- Pestañas -->
-    <ul class="nav nav-tabs" id="myTab" role="tablist">
-      <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="hospitales-tab" data-bs-toggle="tab" data-bs-target="#hospitales" type="button" role="tab" aria-controls="hospitales" aria-selected="true">
-          Hospitales
+    <?php if (isset($error_medicos)): ?>
+        <div class="alert alert-warning text-center"><?php echo htmlspecialchars($error_medicos); ?></div>
+    <?php endif; ?>
+    
+    <!-- Barra de búsqueda -->
+<div class="search-container row">
+    <div class="input-group mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar médico por nombre o especialidad...">
+        <button class="btn btn-outline-primary" type="button" id="searchBtn">
+            <i class="fas fa-search"></i> Buscar
         </button>
-      </li>
-      <li class="nav-item" role="presentation">
-        <button class="nav-link" id="medicos-tab" data-bs-toggle="tab" data-bs-target="#medicos" type="button" role="tab" aria-controls="medicos" aria-selected="false">
-          Médicos
-        </button>
-      </li>
-    </ul>
-
-    <!-- Contenido de pestañas -->
-    <div class="tab-content" id="myTabContent">
-      
-      <!-- Pestaña Hospitales -->
-      <div class="tab-pane fade show active" id="hospitales" role="tabpanel" aria-labelledby="hospitales-tab">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <h2 class="mb-0">Directorio de Hospitales</h2>
-          <div class="admin-toolbar">
-            <button id="btnAgregarHospital" class="btn btn-primary btn-admin">Agregar Hospital</button>
-          </div>
-        </div>
-
-        <div id="gridHospitales" class="row row-cols-1 row-cols-md-2 g-4"></div>
-      </div>
-
-      <!-- Pestaña Médicos -->
-      <div class="tab-pane fade" id="medicos" role="tabpanel" aria-labelledby="medicos-tab">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <h2 class="mb-0">Gestión de Médicos</h2>
-          <div class="admin-toolbar">
-            <button id="btnAgregarMedico" class="btn btn-primary btn-admin">Agregar Médico</button>
-          </div>
-        </div>
-
-        <div class="table-responsive">
-          <table class="table table-striped table-medicos">
-            <thead class="table-primary">
-              <tr>
-                <th>Foto</th>
-                <th>Nombre</th>
-                <th>Especialidad</th>
-                <th>Teléfono</th>
-                <th>Horario</th>
-                <th>Días de Trabajo</th>
-                <th>Hospitales</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody id="tablaMedicos">
-              <!-- Se llenará dinámicamente -->
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
-  </div>
-
-  <!-- MODAL AGREGAR/EDITAR HOSPITAL -->
-  <div class="modal fade" id="hospitalModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content" style="border-radius:12px;">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalHospitalTitle">Agregar Hospital</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formHospital" class="needs-validation" novalidate>
-            <input type="hidden" id="hospitalId">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Nombre del hospital</label>
-                  <input type="text" id="nombreHospital" class="form-control" placeholder="Hospital General" required>
-                  <div class="invalid-feedback">Ingresa el nombre del hospital.</div>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Tipo de hospital</label>
-                  <select id="tipoHospital" class="form-select" required>
-                    <option value="">Selecciona el tipo</option>
-                    <option value="Privado">Privado</option>
-                    <option value="General">General</option>
-                    <option value="Especializado">Especializado</option>
-                    <option value="Universitario">Universitario</option>
-                  </select>
-                  <div class="invalid-feedback">Selecciona el tipo de hospital.</div>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Dirección</label>
-                  <input type="text" id="direccion" class="form-control" placeholder="Av. Principal #123" required>
-                  <div class="invalid-feedback">Ingresa la dirección.</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Teléfono</label>
-                  <input type="tel" id="telefono" class="form-control" placeholder="+52 (33) 1234 5678" required>
-                  <div class="invalid-feedback">Ingresa el teléfono.</div>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Archivo de imagen</label>
-                  <input type="text" id="imagenHospital" class="form-control" placeholder="hospital1.jpg" required>
-                  <div class="invalid-feedback">Ingresa el nombre del archivo de imagen.</div>
-                  <small class="text-muted">Usa solo el nombre del archivo (ej. hospital1.jpg). El sistema añadirá "./img/".</small>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Médicos asignados</label>
-                  <select id="medicosAsignados" class="form-select" multiple>
-                    <!-- Se llenará dinámicamente con médicos disponibles -->
-                  </select>
-                  <small class="text-muted">Mantén presionado Ctrl para seleccionar múltiples médicos.</small>
-                </div>
-              </div>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Guardar Hospital</button>
-          </form>
-        </div>
-      </div>
+    
+    <div class="action-buttons d-flex gap-2 justify-content-end mt-3">
+        <a href="#" class="btn-login">
+            <i class="fas fa-user-plus"></i> Agregar Médico
+        </a>
+        <a href="./Hospitales.php" class="btn-login">
+            <i class="fas fa-hospital"></i> Ver Hospitales
+        </a>
     </div>
-  </div>
-
-  <!-- MODAL DETALLES HOSPITAL -->
-  <div class="modal fade" id="detalleHospitalModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content" style="border-radius:12px;">
-        <div class="modal-header">
-          <h5 class="modal-title" id="detalleHospitalTitle">Detalles del Hospital</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row mb-4">
-            <div class="col-md-3">
-              <img id="detalleHospitalImagen" src="" class="img-fluid rounded" alt="Hospital">
-            </div>
-            <div class="col-md-9">
-              <h4 id="detalleHospitalNombre"></h4>
-              <p class="text-muted mb-2" id="detalleHospitalTipo"></p>
-              <p class="mb-1"><strong>Dirección:</strong> <span id="detalleHospitalDireccion"></span></p>
-              <p class="mb-0"><strong>Teléfono:</strong> <span id="detalleHospitalTelefono"></span></p>
-            </div>
-          </div>
-          
-          <h5 class="mb-3">Médicos del Hospital</h5>
-          <div class="table-responsive">
-            <table class="table table-striped table-hospitales">
-              <thead class="table-primary">
-                <tr>
-                  <th>Nombre</th>
-                  <th>Especialidad</th>
-                  <th>Teléfono</th>
-                  <th>Horario</th>
-                  <th>Días</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="listaMedicosHospital">
-                <!-- Se llenará dinámicamente con los médicos -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL AGREGAR/EDITAR MÉDICO -->
-  <div class="modal fade" id="medicoModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content" style="border-radius:12px;">
-        <div class="modal-header">
-          <h5 class="modal-title" id="modalMedicoTitle">Agregar Médico</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body">
-          <form id="formMedico" class="needs-validation" novalidate>
-            <input type="hidden" id="medicoId">
-            <div class="row">
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Nombre completo</label>
-                  <input type="text" id="nombreMedico" class="form-control" placeholder="Dr. Juan García" required>
-                  <div class="invalid-feedback">Ingresa el nombre del médico.</div>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Especialidad</label>
-                  <input type="text" id="especialidadMedico" class="form-control" placeholder="Cardiología" required>
-                  <div class="invalid-feedback">Ingresa la especialidad.</div>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Teléfono</label>
-                  <input type="tel" id="telefonoMedico" class="form-control" placeholder="+52 (33) 1234 5678" required>
-                  <div class="invalid-feedback">Ingresa el teléfono.</div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="mb-3">
-                  <label class="form-label">Archivo de imagen</label>
-                  <input type="text" id="imagenMedico" class="form-control" placeholder="doctor1.jpg" required>
-                  <div class="invalid-feedback">Ingresa el nombre del archivo de imagen.</div>
-                  <small class="text-muted">Usa solo el nombre del archivo (ej. doctor1.jpg). El sistema añadirá "img/".</small>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Horario de inicio</label>
-                  <input type="time" id="horarioInicio" class="form-control" required>
-                  <div class="invalid-feedback">Ingresa el horario de inicio.</div>
-                </div>
-                <div class="mb-3">
-                  <label class="form-label">Horario de fin</label>
-                  <input type="time" id="horarioFin" class="form-control" required>
-                  <div class="invalid-feedback">Ingresa el horario de fin.</div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- NUEVA SECCIÓN: Días de trabajo -->
-            <div class="mb-3">
-              <label class="form-label">Días de trabajo</label>
-              <div class="dias-trabajo">
-                <div class="dia-checkbox">
-                  <input type="checkbox" id="diaLunes" value="Lunes" class="form-check-input">
-                  <label class="form-check-label" for="diaLunes">Lunes</label>
-                </div>
-                <div class="dia-checkbox">
-                  <input type="checkbox" id="diaMartes" value="Martes" class="form-check-input">
-                  <label class="form-check-label" for="diaMartes">Martes</label>
-                </div>
-                <div class="dia-checkbox">
-                  <input type="checkbox" id="diaMiercoles" value="Miércoles" class="form-check-input">
-                  <label class="form-check-label" for="diaMiercoles">Miércoles</label>
-                </div>
-                <div class="dia-checkbox">
-                  <input type="checkbox" id="diaJueves" value="Jueves" class="form-check-input">
-                  <label class="form-check-label" for="diaJueves">Jueves</label>
-                </div>
-                <div class="dia-checkbox">
-                  <input type="checkbox" id="diaViernes" value="Viernes" class="form-check-input">
-                  <label class="form-check-label" for="diaViernes">Viernes</label>
-                </div>
-                <div class="dia-checkbox">
-                  <input type="checkbox" id="diaSabado" value="Sábado" class="form-check-input">
-                  <label class="form-check-label" for="diaSabado">Sábado</label>
-                </div>
-                <div class="dia-checkbox">
-                  <input type="checkbox" id="diaDomingo" value="Domingo" class="form-check-input">
-                  <label class="form-check-label" for="diaDomingo">Domingo</label>
-                </div>
-              </div>
-              <div class="invalid-feedback">Selecciona al menos un día de trabajo.</div>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Descripción</label>
-              <textarea id="descripcionMedico" class="form-control" rows="3" placeholder="Descripción del médico..." required></textarea>
-              <div class="invalid-feedback">Ingresa una descripción.</div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Hospitales asignados</label>
-              <select id="hospitalesAsignados" class="form-select" multiple>
-                <!-- Se llenará dinámicamente -->
-              </select>
-              <small class="text-muted">Mantén presionado Ctrl para seleccionar múltiples hospitales.</small>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Guardar Médico</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="../js/navbar.js"></script>
-  <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    // Gate de rol para botones admin
-    (function gateByRole(){
-      const rol = localStorage.getItem("rolUsuario");
-      if (rol !== "admin") {
-        document.querySelectorAll(".btn-admin").forEach(btn => btn.style.display = "none");
-      }
-    })();
-
-    function cryptoRandomId(){
-      return 'h_' + Math.random().toString(36).slice(2,10);
-    }
-
-    function cryptoRandomIdMedico(){
-      return 'm_' + Math.random().toString(36).slice(2,10);
-    }
-
-    // ========== DATOS INICIALES ==========
-
-    // Médicos base (9 médicos) CON DÍAS DE TRABAJO
-    const seedMedicos = [
-      { 
-        id: "m_1", 
-        nombre: "Dr. Juan García", 
-        especialidad: "Cardiología", 
-        imagen: "doctor1.jpg", 
-        telefono: "+52 (33) 1234 5678", 
-        descripcion: "Especialista en enfermedades cardiovasculares", 
-        horarioInicio: "09:00", 
-        horarioFin: "14:00",
-        diasTrabajo: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
-      },
-      { 
-        id: "m_2", 
-        nombre: "Dra. María López", 
-        especialidad: "Pediatría", 
-        imagen: "doctora1.jpg", 
-        telefono: "+52 (33) 1234 5679", 
-        descripcion: "Atención integral para niños y adolescentes", 
-        horarioInicio: "10:00", 
-        horarioFin: "16:00",
-        diasTrabajo: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
-      },
-      { 
-        id: "m_3", 
-        nombre: "Dr. Luis Ramírez", 
-        especialidad: "Neumología", 
-        imagen: "doctor2.jpg", 
-        telefono: "+52 (33) 1234 5680", 
-        descripcion: "Enfermedades respiratorias y pulmonares", 
-        horarioInicio: "09:00", 
-        horarioFin: "13:00",
-        diasTrabajo: ["Lunes", "Miércoles", "Viernes"]
-      },
-      { 
-        id: "m_4", 
-        nombre: "Dra. Ana Fernández", 
-        especialidad: "Dermatología", 
-        imagen: "doctora2.jpg", 
-        telefono: "+52 (33) 1234 5681", 
-        descripcion: "Piel, cabello y uñas", 
-        horarioInicio: "11:00", 
-        horarioFin: "17:00",
-        diasTrabajo: ["Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
-      },
-      { 
-        id: "m_5", 
-        nombre: "Dr. Carlos Martínez", 
-        especialidad: "Medicina General", 
-        imagen: "doctor3.jpg", 
-        telefono: "+52 (33) 1234 5682", 
-        descripcion: "Atención primaria y seguimiento clínico", 
-        horarioInicio: "08:00", 
-        horarioFin: "14:00",
-        diasTrabajo: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
-      },
-      { 
-        id: "m_6", 
-        nombre: "Dra. Elena Rivas", 
-        especialidad: "Ginecología", 
-        imagen: "doctora3.jpg", 
-        telefono: "+52 (33) 1234 5683", 
-        descripcion: "Salud femenina y planificación familiar", 
-        horarioInicio: "10:00", 
-        horarioFin: "15:00",
-        diasTrabajo: ["Lunes", "Martes", "Jueves", "Viernes"]
-      },
-      { 
-        id: "m_7", 
-        nombre: "Dr. Miguel Torres", 
-        especialidad: "Psicología", 
-        imagen: "doctor4.jpg", 
-        telefono: "+52 (33) 1234 5684", 
-        descripcion: "Terapia cognitivo-conductual y apoyo emocional", 
-        horarioInicio: "12:00", 
-        horarioFin: "18:00",
-        diasTrabajo: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
-      },
-      { 
-        id: "m_8", 
-        nombre: "Dra. Laura Navarro", 
-        especialidad: "Endocrinología", 
-        imagen: "doctora4.jpg", 
-        telefono: "+52 (33) 1234 5685", 
-        descripcion: "Trastornos hormonales y metabólicos", 
-        horarioInicio: "09:00", 
-        horarioFin: "13:00",
-        diasTrabajo: ["Lunes", "Miércoles", "Viernes"]
-      },
-      { 
-        id: "m_9", 
-        nombre: "Dr. Roberto Hernández", 
-        especialidad: "Medicina Interna", 
-        imagen: "doctor5.jpg", 
-        telefono: "+52 (33) 1234 5686", 
-        descripcion: "Diagnóstico y manejo de enfermedades complejas", 
-        horarioInicio: "10:00", 
-        horarioFin: "16:00",
-        diasTrabajo: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"]
-      }
-    ];
-
-    // Datos iniciales de hospitales
-    const seedHospitales = [
-      {
-        id: cryptoRandomId(),
-        nombre: "Hospital Central Guadalajara",
-        tipo: "Privado",
-        direccion: "Av. Federalismo #1234",
-        telefono: "+52 (33) 1234 5678",
-        imagen: "hospital1.jpg",
-        medicos: ["m_1", "m_2"]
-      },
-      {
-        id: cryptoRandomId(),
-        nombre: "Hospital General de Occidente",
-        tipo: "General",
-        direccion: "Av. Patria #567",
-        telefono: "+52 (33) 2345 6789",
-        imagen: "hospital2.jpg",
-        medicos: ["m_3", "m_4"]
-      },
-      {
-        id: cryptoRandomId(),
-        nombre: "Clínica DermaCare",
-        tipo: "Especializado",
-        direccion: "Calz. Independencia #890",
-        telefono: "+52 (33) 3456 7890",
-        imagen: "hospital3.jpg",
-        medicos: ["m_5", "m_6"]
-      },
-      {
-        id: cryptoRandomId(),
-        nombre: "Hospital de la Mujer",
-        tipo: "Especializado",
-        direccion: "Av. Juárez #321",
-        telefono: "+52 (33) 4567 8901",
-        imagen: "hospital4.jpg",
-        medicos: ["m_7", "m_8"]
-      },
-      {
-        id: cryptoRandomId(),
-        nombre: "Centro de Salud Mental",
-        tipo: "Especializado",
-        direccion: "Av. Vallarta #654",
-        telefono: "+52 (33) 5678 9012",
-        imagen: "hospital5.jpg",
-        medicos: ["m_9"]
-      }
-    ];
-
-    // ========== FUNCIONES GENERALES ==========
-
-    function getHospitales(){
-      let hospitales = JSON.parse(localStorage.getItem("hospitales"));
-      if (!hospitales || !Array.isArray(hospitales) || hospitales.length === 0) {
-        localStorage.setItem("hospitales", JSON.stringify(seedHospitales));
-        hospitales = seedHospitales;
-      }
-      return hospitales;
-    }
-
-    function getMedicos(){
-      let medicos = JSON.parse(localStorage.getItem("medicos"));
-      if (!medicos || !Array.isArray(medicos) || medicos.length === 0) {
-        localStorage.setItem("medicos", JSON.stringify(seedMedicos));
-        medicos = seedMedicos;
-      }
-      return medicos;
-    }
-
-    function setHospitales(hospitales){
-      localStorage.setItem("hospitales", JSON.stringify(hospitales));
-    }
-
-    function setMedicos(medicos){
-      localStorage.setItem("medicos", JSON.stringify(medicos));
-    }
-
-    function buildImgSrc(fileOrPath){
-      if (!fileOrPath || typeof fileOrPath !== "string") return "./img/placeholder.jpg";
-      const clean = fileOrPath.trim();
-      const filename = clean.replace(/^img\//, "");
-      return "./img/" + filename;
-    }
-
-    // ========== FUNCIONES PARA HORARIOS Y DÍAS ==========
-
-    // Función para formatear horario de manera segura
-    function formatearHorario(medico) {
-        if (!medico) return 'Horario no disponible';
-        
-        if (medico.horarioInicio && medico.horarioFin && 
-            medico.horarioInicio !== 'undefined' && medico.horarioFin !== 'undefined') {
-            return `${formatearHora(medico.horarioInicio)} - ${formatearHora(medico.horarioFin)}`;
+</div>
+    
+    <!-- Filtros por especialidad -->
+    <div class="filter-buttons" id="filterButtons">
+        <button class="filter-btn active" data-filter="all">Todos</button>
+        <?php
+        // Obtener especialidades únicas
+        $especialidades = [];
+        foreach ($medicos as $medico) {
+            if (!empty($medico['especialidad'])) {
+                $especialidades[] = $medico['especialidad'];
+            }
         }
+        $especialidades = array_unique($especialidades);
+        sort($especialidades);
         
-        return 'Horario no definido';
-    }
+        foreach ($especialidades as $especialidad):
+        ?>
+            <button class="filter-btn" data-filter="<?php echo htmlspecialchars(strtolower($especialidad)); ?>">
+                <?php echo htmlspecialchars($especialidad); ?>
+            </button>
+        <?php endforeach; ?>
+    </div>
+    
+    <!-- Contador de médicos -->
+    <div class="medico-count" id="medicoCount">
+        Mostrando <span id="count"><?php echo count($medicos); ?></span> médico(s)
+    </div>
 
-    // Función para formatear hora de 24h a 12h
-    function formatearHora(hora24) {
-        if (!hora24) return '';
-        const [horas, minutos] = hora24.split(':');
-        const hora = parseInt(horas);
-        const ampm = hora >= 12 ? 'PM' : 'AM';
-        const hora12 = hora % 12 || 12;
-        return `${hora12}:${minutos} ${ampm}`;
-    }
+    <!-- Grid de médicos -->
+    <div class="row g-4" id="medicosGrid">
+        <?php if (empty($medicos)): ?>
+            <div class="col-12 text-center">
+                <div class="alert alert-info">
+                    No hay médicos disponibles en este momento.
+                </div>
+            </div>
+        <?php else: ?>
+            <?php foreach ($medicos as $medico): ?>
+                <div class="col-md-4 col-lg-3 medico-card" 
+                     data-especialidad="<?php echo htmlspecialchars(strtolower($medico['especialidad'])); ?>"
+                     data-nombre="<?php echo htmlspecialchars(strtolower($medico['usuario_nombre'])); ?>">
+                    <div class="card">
+                        <!-- Imagen del médico -->
+                        <?php if (!empty($medico['foto'])): ?>
+                            <img src="<?php echo htmlspecialchars($medico['foto']); ?>" 
+                                 class="card-img-top" 
+                                 alt="<?php echo htmlspecialchars($medico['usuario_nombre']); ?>"
+                                 onerror="this.src='./img/doctor1.jpg'">
+                        <?php else: ?>
+                            <div class="card-img-top no-image">
+                                <i class="fas fa-user-md"></i>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo htmlspecialchars($medico['usuario_nombre']); ?></h5>
+                            
+                            <!-- Especialidad -->
+                            <div class="especialidad-badge">
+                                <i class="fas fa-stethoscope"></i>
+                                <?php echo htmlspecialchars($medico['especialidad']); ?>
+                            </div>
+                            
+                            <!-- Hospital -->
+                            <?php if (!empty($medico['hospital_nombre'])): ?>
+                                <div class="hospital-info">
+                                    <i class="fas fa-hospital"></i>
+                                    <?php echo htmlspecialchars($medico['hospital_nombre']); ?>
+                                    <?php if (!empty($medico['hospital_direccion'])): ?>
+                                        <br><small><?php echo htmlspecialchars($medico['hospital_direccion']); ?></small>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <!-- Horario -->
+                            <?php if (!empty($medico['horario'])): ?>
+                                <div class="horario-info">
+                                    <i class="far fa-clock"></i>
+                                    <?php echo htmlspecialchars($medico['horario']); ?>
+                                </div>
+                            <?php endif; ?>
+                            
+                            <!-- Botón ver perfil -->
+                            <div class="text-center mt-3">
+                                <a href="./perfil-medico.php?id=<?php echo $medico['id_medico']; ?>" 
+                                   class="btn-ver">
+                                    <i class="fas fa-user-circle"></i> Ver Perfil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>
 
-    // Función para formatear días de trabajo
-    function formatearDiasTrabajo(diasArray) {
-        if (!diasArray || !Array.isArray(diasArray) || diasArray.length === 0) {
-            return 'No definido';
-        }
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+<script>
+    // Funcionalidad de búsqueda y filtrado
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const medicoCards = document.querySelectorAll('.medico-card');
+        const countElement = document.getElementById('count');
         
-        // Ordenar días de la semana
-        const ordenDias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-        const diasOrdenados = diasArray.sort((a, b) => ordenDias.indexOf(a) - ordenDias.indexOf(b));
-        
-        return diasOrdenados.join(', ');
-    }
-
-    // Función para obtener nombre del día en español
-    function obtenerNombreDia(fecha) {
-        const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-        return dias[fecha.getDay()];
-    }
-
-    // ========== FUNCIONES HOSPITALES ==========
-
-    function renderGridHospitales(){
-      const rol = localStorage.getItem("rolUsuario");
-      const cont = document.getElementById("gridHospitales");
-      const hospitales = getHospitales();
-      const medicos = getMedicos();
-
-      cont.innerHTML = hospitales.map(h => {
-        const medicosAsignados = h.medicos.map(medicoId => 
-          medicos.find(m => m.id === medicoId)
-        ).filter(m => m);
-
-        return `
-          <div class="col">
-            <div class="card h-100 hospital-card">
-              <img src="./img/${buildImgSrc(h.imagen)}" class="card-img-top" alt="${h.nombre}">
-              <div class="card-body">
-                <h5 class="card-title">${h.nombre}</h5>
-                <p class="tipo-hospital mb-2">${h.tipo}</p>
-                <p class="card-text"><strong>Dirección:</strong> ${h.direccion}</p>
-                <p class="card-text"><strong>Teléfono:</strong> ${h.telefono}</p>
+        // Función para filtrar médicos
+        function filterMedicos() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            
+            let visibleCount = 0;
+            
+            medicoCards.forEach(card => {
+                const nombre = card.dataset.nombre;
+                const especialidad = card.dataset.especialidad;
+                const textoCard = card.textContent.toLowerCase();
                 
-                <div class="mt-3">
-                  <h6>Médicos asignados (${medicosAsignados.length}):</h6>
-                  ${medicosAsignados.map(m => 
-                    `<span class="medico-badge me-2 mb-2 d-inline-block">${m.nombre}</span>`
-                  ).join('')}
+                // Aplicar filtro de especialidad
+                const matchesFilter = activeFilter === 'all' || especialidad.includes(activeFilter);
+                
+                // Aplicar filtro de búsqueda
+                const matchesSearch = searchTerm === '' || 
+                                     nombre.includes(searchTerm) || 
+                                     especialidad.includes(searchTerm) ||
+                                     textoCard.includes(searchTerm);
+                
+                // Mostrar u ocultar tarjeta
+                if (matchesFilter && matchesSearch) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Actualizar contador
+            countElement.textContent = visibleCount;
+        }
+        
+        // Evento en botón de búsqueda
+        searchBtn.addEventListener('click', filterMedicos);
+        
+        // Evento en input de búsqueda (buscar al escribir)
+        searchInput.addEventListener('keyup', filterMedicos);
+        
+        // Eventos en botones de filtro
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remover clase active de todos los botones
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                // Agregar clase active al botón clickeado
+                this.classList.add('active');
+                // Aplicar filtros
+                filterMedicos();
+            });
+        });
+        
+        // Inicializar filtros
+        filterMedicos();
+        
+        // Si el usuario está logueado desde localStorage (para compatibilidad)
+        const usuarioActual = localStorage.getItem("usuarioActual");
+        if (usuarioActual && !document.querySelector('.welcome')) {
+            document.getElementById("loginArea").innerHTML = `
+                <div class="welcome">
+                    <p> Bienvenido, <strong>${usuarioActual}</strong></p>
+                    <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>
                 </div>
-              </div>
-              <div class="card-footer bg-white text-center">
-                <button class="btn btn-info btn-sm me-2" onclick="verDetalleHospital('${h.id}')">Ver detalles</button>
-                <button class="btn btn-warning btn-sm btn-admin" data-action="edit" data-id="${h.id}" ${rol!=='admin'?'style="display:none"':''}>Editar</button>
-                <button class="btn btn-danger btn-sm btn-admin" data-action="delete" data-id="${h.id}" ${rol!=='admin'?'style="display:none"':''}>Eliminar</button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      cont.querySelectorAll("button.btn-admin").forEach(btn => {
-        btn.addEventListener("click", onAdminActionHospital);
-      });
-    }
-
-    function verDetalleHospital(hospitalId) {
-      const hospitales = getHospitales();
-      const medicos = getMedicos();
-      const hospital = hospitales.find(h => h.id === hospitalId);
-      
-      if (!hospital) return;
-
-      const medicosAsignados = hospital.medicos.map(medicoId => 
-        medicos.find(m => m.id === medicoId)
-      ).filter(m => m);
-
-      // Llenar el modal de detalles
-      document.getElementById('detalleHospitalTitle').textContent = hospital.nombre;
-      document.getElementById('detalleHospitalNombre').textContent = hospital.nombre;
-      document.getElementById('detalleHospitalTipo').textContent = hospital.tipo;
-      document.getElementById('detalleHospitalDireccion').textContent = hospital.direccion;
-      document.getElementById('detalleHospitalTelefono').textContent = hospital.telefono;
-      document.getElementById('detalleHospitalImagen').src = buildImgSrc(hospital.imagen);
-
-      // Llenar la tabla de médicos
-      const listaMedicos = document.getElementById('listaMedicosHospital');
-      if (medicosAsignados.length === 0) {
-        listaMedicos.innerHTML = `
-          <tr>
-            <td colspan="6" class="text-center text-muted py-4">
-              No hay médicos asignados a este hospital
-            </td>
-          </tr>
-        `;
-      } else {
-        listaMedicos.innerHTML = medicosAsignados.map(medico => `
-          <tr>
-            <td>${medico.nombre}</td>
-            <td>${medico.especialidad}</td>
-            <td>${medico.telefono}</td>
-            <td>${formatearHorario(medico)}</td>
-            <td>${formatearDiasTrabajo(medico.diasTrabajo)}</td>
-            <td>
-              <a href="./Doctores/${medico.id.replace('m_', 'doctor')}.php" class="btn btn-outline-primary btn-sm">
-                Ver perfil
-              </a>
-            </td>
-          </tr>
-        `).join('');
-      }
-
-      // Mostrar el modal
-      const detalleModal = new bootstrap.Modal(document.getElementById('detalleHospitalModal'));
-      detalleModal.show();
-    }
-
-    function onAdminActionHospital(e){
-      const btn = e.currentTarget;
-      const action = btn.dataset.action;
-      const id = btn.dataset.id;
-      const hospitales = getHospitales();
-      const item = hospitales.find(h => h.id === id);
-      if (!item) return;
-
-      if (action === "edit") {
-        openModalHospital(item);
-      } else if (action === "delete") {
-        if (confirm(`¿Eliminar el hospital "${item.nombre}"?`)) {
-          const updated = hospitales.filter(h => h.id !== id);
-          setHospitales(updated);
-          renderGridHospitales();
-          renderTablaMedicos();
-          alert("Hospital eliminado correctamente.");
+            `;
+            document.getElementById("logoutBtn").addEventListener("click", () => {
+                localStorage.removeItem("usuarioActual");
+                window.location.reload();
+            });
         }
-      }
-    }
-
-    // ========== FUNCIONES MÉDICOS ==========
-
-    function renderTablaMedicos(){
-      const tabla = document.getElementById("tablaMedicos");
-      const medicos = getMedicos();
-      const hospitales = getHospitales();
-
-      if (medicos.length === 0) {
-        tabla.innerHTML = `
-          <tr>
-            <td colspan="8" class="text-center text-muted py-4">
-              No hay médicos registrados
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      tabla.innerHTML = medicos.map(medico => {
-        const hospitalesDelMedico = hospitales.filter(h => 
-          h.medicos && h.medicos.includes(medico.id)
-        );
-
-        return `
-          <tr>
-            <td>
-              <img src="./img/${buildImgSrc(medico.imagen)}" class="medico-img" alt="${medico.nombre}">
-            </td>
-            <td>${medico.nombre}</td>
-            <td>${medico.especialidad}</td>
-            <td>${medico.telefono}</td>
-            <td>${formatearHorario(medico)}</td>
-            <td>${formatearDiasTrabajo(medico.diasTrabajo)}</td>
-            <td>
-              ${hospitalesDelMedico.map(h => 
-                `<span class="badge bg-secondary me-1">${h.nombre}</span>`
-              ).join('')}
-              ${hospitalesDelMedico.length === 0 ? '<span class="text-muted">Sin hospital asignado</span>' : ''}
-            </td>
-            <td>
-              <button class="btn btn-warning btn-sm me-1" onclick="editarMedico('${medico.id}')">Editar</button>
-              <button class="btn btn-danger btn-sm" onclick="eliminarMedico('${medico.id}')">Eliminar</button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function editarMedico(medicoId) {
-      const medicos = getMedicos();
-      const medico = medicos.find(m => m.id === medicoId);
-      if (!medico) return;
-
-      openModalMedico(medico);
-    }
-
-    function eliminarMedico(medicoId) {
-      const medicos = getMedicos();
-      const medico = medicos.find(m => m.id === medicoId);
-      if (!medico) return;
-
-      if (confirm(`¿Estás seguro de eliminar a ${medico.nombre}?`)) {
-        const medicosActualizados = medicos.filter(m => m.id !== medicoId);
-        setMedicos(medicosActualizados);
-
-        const hospitales = getHospitales();
-        hospitales.forEach(hospital => {
-          if (hospital.medicos && hospital.medicos.includes(medicoId)) {
-            hospital.medicos = hospital.medicos.filter(id => id !== medicoId);
-          }
-        });
-        localStorage.setItem("hospitales", JSON.stringify(hospitales));
-
-        renderTablaMedicos();
-        renderGridHospitales();
-        alert("Médico eliminado correctamente.");
-      }
-    }
-
-    function actualizarHospitalesConMedicos(medicoId, hospitalesSeleccionados) {
-      const hospitales = getHospitales();
-      hospitales.forEach(hospital => {
-        if (hospital.medicos.includes(medicoId) && !hospitalesSeleccionados.includes(hospital.id)) {
-          hospital.medicos = hospital.medicos.filter(id => id !== medicoId);
-        }
-        if (!hospital.medicos.includes(medicoId) && hospitalesSeleccionados.includes(hospital.id)) {
-          hospital.medicos.push(medicoId);
-        }
-      });
-      localStorage.setItem("hospitales", JSON.stringify(hospitales));
-    }
-
-    // ========== MODALES ==========
-
-    // Modal Hospital
-    const modalHospitalEl = document.getElementById('hospitalModal');
-    const modalHospital = new bootstrap.Modal(modalHospitalEl);
-    const formHospital = document.getElementById('formHospital');
-
-    document.getElementById("btnAgregarHospital")?.addEventListener("click", () => {
-      openModalHospital(null);
     });
-
-    function openModalHospital(hospital){
-      document.getElementById('modalHospitalTitle').textContent = hospital ? 'Editar Hospital' : 'Agregar Hospital';
-      document.getElementById('hospitalId').value = hospital?.id || '';
-      document.getElementById('nombreHospital').value = hospital?.nombre || '';
-      document.getElementById('tipoHospital').value = hospital?.tipo || '';
-      document.getElementById('direccion').value = hospital?.direccion || '';
-      document.getElementById('telefono').value = hospital?.telefono || '';
-      document.getElementById('imagenHospital').value = (hospital?.imagen || '').replace(/^img\//, '');
-      
-      const medicosSelect = document.getElementById('medicosAsignados');
-      const medicos = getMedicos();
-      
-      medicosSelect.innerHTML = medicos.map(m => 
-        `<option value="${m.id}" ${hospital?.medicos?.includes(m.id) ? 'selected' : ''}>${m.nombre} - ${m.especialidad}</option>`
-      ).join('');
-      
-      formHospital.classList.remove('was-validated');
-      modalHospital.show();
-    }
-
-    formHospital.addEventListener('submit', function(event){
-      if (!formHospital.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
-        formHospital.classList.add('was-validated');
-        return;
-      }
-      event.preventDefault();
-
-      const hospitales = getHospitales();
-      const medicosSelect = document.getElementById('medicosAsignados');
-      const medicosSeleccionados = Array.from(medicosSelect.selectedOptions).map(option => option.value);
-
-      const payload = {
-        id: document.getElementById('hospitalId').value || cryptoRandomId(),
-        nombre: document.getElementById('nombreHospital').value.trim(),
-        tipo: document.getElementById('tipoHospital').value,
-        direccion: document.getElementById('direccion').value.trim(),
-        telefono: document.getElementById('telefono').value.trim(),
-        imagen: document.getElementById('imagenHospital').value.trim().replace(/^img\//, ''),
-        medicos: medicosSeleccionados
-      };
-
-      const existingIndex = hospitales.findIndex(h => h.id === payload.id);
-      if (existingIndex >= 0) {
-        hospitales[existingIndex] = payload;
-      } else {
-        hospitales.push(payload);
-      }
-      setHospitales(hospitales);
-      modalHospital.hide();
-      renderGridHospitales();
-      renderTablaMedicos();
-      alert("Hospital guardado correctamente.");
-    });
-
-    // Modal Médico
-    const modalMedicoEl = document.getElementById('medicoModal');
-    const modalMedico = new bootstrap.Modal(modalMedicoEl);
-    const formMedico = document.getElementById('formMedico');
-
-    document.getElementById("btnAgregarMedico")?.addEventListener("click", () => {
-      openModalMedico(null);
-    });
-
-    function openModalMedico(medico){
-      document.getElementById('modalMedicoTitle').textContent = medico ? 'Editar Médico' : 'Agregar Médico';
-      document.getElementById('medicoId').value = medico?.id || '';
-      document.getElementById('nombreMedico').value = medico?.nombre || '';
-      document.getElementById('especialidadMedico').value = medico?.especialidad || '';
-      document.getElementById('telefonoMedico').value = medico?.telefono || '';
-      document.getElementById('imagenMedico').value = (medico?.imagen || '').replace(/^img\//, '');
-      document.getElementById('horarioInicio').value = medico?.horarioInicio || '';
-      document.getElementById('horarioFin').value = medico?.horarioFin || '';
-      document.getElementById('descripcionMedico').value = medico?.descripcion || '';
-
-      // Llenar checkboxes de días de trabajo
-      const diasCheckboxes = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-      diasCheckboxes.forEach(dia => {
-        const checkbox = document.getElementById(`dia${dia}`);
-        if (checkbox) {
-          checkbox.checked = medico?.diasTrabajo?.includes(dia) || false;
-        }
-      });
-
-      // Llenar select de hospitales
-      const hospitalesSelect = document.getElementById('hospitalesAsignados');
-      const hospitales = getHospitales();
-      const hospitalesDelMedico = medico ? hospitales.filter(h => 
-        h.medicos && h.medicos.includes(medico.id)
-      ).map(h => h.id) : [];
-
-      hospitalesSelect.innerHTML = hospitales.map(h => 
-        `<option value="${h.id}" ${hospitalesDelMedico.includes(h.id) ? 'selected' : ''}>${h.nombre}</option>`
-      ).join('');
-
-      formMedico.classList.remove('was-validated');
-      modalMedico.show();
-    }
-
-    formMedico.addEventListener('submit', function(event){
-      if (!formMedico.checkValidity()) {
-        event.preventDefault();
-        event.stopPropagation();
-        formMedico.classList.add('was-validated');
-        return;
-      }
-      event.preventDefault();
-
-      // Validar que se seleccionó al menos un día
-      const diasSeleccionados = [];
-      const diasCheckboxes = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-      diasCheckboxes.forEach(dia => {
-        const checkbox = document.getElementById(`dia${dia}`);
-        if (checkbox && checkbox.checked) {
-          diasSeleccionados.push(dia);
-        }
-      });
-
-      if (diasSeleccionados.length === 0) {
-        alert("Debes seleccionar al menos un día de trabajo.");
-        return;
-      }
-
-      const medicos = getMedicos();
-      const hospitalesSelect = document.getElementById('hospitalesAsignados');
-      const hospitalesSeleccionados = Array.from(hospitalesSelect.selectedOptions).map(option => option.value);
-
-      const payload = {
-        id: document.getElementById('medicoId').value || cryptoRandomIdMedico(),
-        nombre: document.getElementById('nombreMedico').value.trim(),
-        especialidad: document.getElementById('especialidadMedico').value.trim(),
-        telefono: document.getElementById('telefonoMedico').value.trim(),
-        imagen: document.getElementById('imagenMedico').value.trim().replace(/^img\//, ''),
-        horarioInicio: document.getElementById('horarioInicio').value,
-        horarioFin: document.getElementById('horarioFin').value,
-        diasTrabajo: diasSeleccionados,
-        descripcion: document.getElementById('descripcionMedico').value.trim()
-      };
-
-      // Validar horarios
-      if (payload.horarioFin <= payload.horarioInicio) {
-        alert("El horario de fin debe ser mayor al horario de inicio.");
-        return;
-      }
-
-      const existingIndex = medicos.findIndex(m => m.id === payload.id);
-      if (existingIndex >= 0) {
-        medicos[existingIndex] = payload;
-      } else {
-        medicos.push(payload);
-      }
-      setMedicos(medicos);
-
-      // Actualizar asignación a hospitales
-      actualizarHospitalesConMedicos(payload.id, hospitalesSeleccionados);
-
-      modalMedico.hide();
-      renderTablaMedicos();
-      renderGridHospitales();
-      alert("Médico guardado correctamente.");
-    });
-
-    // ========== INICIALIZACIÓN ==========
-
-    // Inicializar ambas vistas
-    renderGridHospitales();
-    renderTablaMedicos();
-  </script>
-  <script src="./js/navbar.js"></script>
-  <script>
-// Control de acceso específico para Médicos.php
-document.addEventListener('DOMContentLoaded', function() {
-    const rolUsuario = localStorage.getItem('rolUsuario');
-    
-    if (rolUsuario === 'medico') {
-        // Ocultar completamente la pestaña de hospitales
-        const hospitalesTab = document.getElementById('hospitales-tab');
-        const hospitalesPane = document.getElementById('hospitales');
-        
-        if (hospitalesTab) hospitalesTab.style.display = 'none';
-        if (hospitalesPane) hospitalesPane.style.display = 'none';
-        
-        // Mostrar solo la pestaña de médicos y activarla
-        const medicosTab = document.getElementById('medicos-tab');
-        if (medicosTab) {
-            medicosTab.classList.add('active');
-            medicosTab.click();
-        }
-        
-        // Ocultar botones de agregar
-        document.querySelectorAll('.btn-admin').forEach(btn => {
-            btn.style.display = 'none';
-        });
-        
-        // Cambiar título para médico
-        const titulo = document.querySelector('h1');
-        if (titulo) {
-            titulo.textContent = 'Directorio de Médicos - Solo Lectura';
-        }
-    }
-});
 </script>
 </body>
 </html>

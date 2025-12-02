@@ -35,7 +35,7 @@
 
   <nav class="navbar">
     <ul class="menu">
-      <li><a href="./Principal.php">Inicio</a></li>
+      <li><a href="./src/Principal.php">Inicio</a></li>
       <li><a href="./Medicos.php">Hospitales & Médicos</a></li>
       <li><a href="./Agenda.php">Agenda</a></li>
       <li><a href="./Consultas.php">Consultas</a></li>

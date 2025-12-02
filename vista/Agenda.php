@@ -11,69 +11,86 @@ $userRole = $_SESSION['rol'] ?? 'paciente';
 
 // Permitir solo médicos y administradores
 if ($userRole !== 'medico' && $userRole !== 'administrador') {
-    header('Location: ./src/principal.php');
+    header('Location: ./medicosPublic.php');
     exit;
 }
+
+// Mostrar mensajes de éxito/error
+$mensaje = '';
+$tipoMensaje = '';
+if (isset($_SESSION['ok_cita'])) {
+    $mensaje = $_SESSION['ok_cita'];
+    $tipoMensaje = 'success';
+    unset($_SESSION['ok_cita']);
+}
+if (isset($_SESSION['error_cita'])) {
+    $mensaje = $_SESSION['error_cita'];
+    $tipoMensaje = 'error';
+    unset($_SESSION['error_cita']);
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Agenda de Citas | Red Médica</title>
-  <link rel="stylesheet" href="./css/Principal.css">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
-  <style>
-    body { animation: fadeInPage 0.8s ease-in-out; }
-    @keyframes fadeInPage { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    #calendar {
-      max-width: 1000px; margin: 50px auto; background: #fff; border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 20px;
-    }
-    .horario-info {
-      background-color: #e8f4fd;
-      border-left: 4px solid #4c7ea6;
-      padding: 10px;
-      border-radius: 4px;
-      margin-bottom: 15px;
-    }
-    .error-horario, .error-dia {
-      color: #dc3545;
-      font-size: 0.875em;
-      margin-top: 0.25rem;
-      display: none;
-    }
-    .dias-info {
-      background-color: #f0f8ff;
-      border-left: 4px solid #87ceeb;
-      padding: 8px;
-      border-radius: 4px;
-      margin-top: 5px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamiento de Citas Médicas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="./css/Principal.css">
+    <link rel="stylesheet" href="./css/Agenda.css">
+    <style>
+        .alert {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .selected-date {
+            background-color: #4CAF50 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+        .today {
+            background-color: #e3f2fd !important;
+            font-weight: bold;
+        }
+        .past-day {
+            color: #ccc !important;
+            cursor: not-allowed !important;
+        }
+    </style>
 </head>
 <body>
-
-  <!-- ENCABEZADO -->
-  <header class="top-header">
-    <div class="logo"><img src="./img/Logo.jpg" alt="Logo"></div>
-    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
-    <div class="login" id="loginArea"><a href="./login.php" class="btn-login">Iniciar Sesión</a></div>
-     <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+   <header class="top-header">
+    <div class="logo"><img src="./img/Logo.jpg" alt="Logo Red Médica"></div>
+    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | contacto@redmedica.mx</p></div>
+    <div class="login" id="loginArea">
+      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
         <div class="welcome">
-            <h1>¡Bienvenido, <?php echo $_SESSION['nombre']; ?>!</h1>
-            <p>Has iniciado sesión correctamente como: <?php echo $_SESSION['rol']?></p>
-            <a href="../controlador/login.php"  class="btn-login">Cerrar Sesión</a>
+            <h1>¡Bienvenido, <?php echo htmlspecialchars($_SESSION['nombre']); ?>!</h1>
+            <p>Has iniciado sesión correctamente como: <?php echo htmlspecialchars($_SESSION['rol']); ?></p>
+            <a href="../controlador/login.php" class="btn-login">Cerrar Sesión</a>
         </div>
     <?php else: ?>
         <div class="not-logged">
             <p>No has iniciado sesión.</p>
-            <a href="../controlador/login.php"  class="btn-login">Ir al Login</a>
+            <a href="../controlador/login.php" class="btn-login">Ir al Login</a>
         </div>
     <?php endif; ?>
+    </div>
   </header>
 
-  <!-- NAVBAR -->
   <nav class="navbar">
     <ul class="menu">
       <li><a href="./src/principal.php">Inicio</a></li>
@@ -81,7 +98,7 @@ if ($userRole !== 'medico' && $userRole !== 'administrador') {
       <li><a href="./Agenda.php">Agenda</a></li>
       <li><a href="./Consultas.php">Consultas</a></li>
       <li class="dropdown">
-        <a href="">Servicios ▾</a>
+        <a href="#">Servicios ▾</a>
         <ul class="submenu">
           <li><a href="./Hospitalizacion.php">Hospitalización</a></li>
           <li><a href="./Laboratorio.php">Laboratorio Clínico</a></li>
@@ -93,700 +110,270 @@ if ($userRole !== 'medico' && $userRole !== 'administrador') {
         </ul>
       </li>
       <li><a href="./Recetas.php">Recetas</a></li>
+      <li><a href="./Reportes.php">Reportes</a></li>
     </ul>
   </nav>
 
-  <!-- CALENDARIO -->
-  <div id="calendar"></div>
+    <div class="container">
+        <h1><i class="fas fa-calendar-check"></i> Sistema de Agendamiento de Citas</h1>
+        <p>Seleccione una fecha en el calendario y complete el formulario para agendar su cita médica</p>
+        
+        <!-- Mostrar mensajes -->
+        <?php if ($mensaje): ?>
+            <div class="alert alert-<?php echo $tipoMensaje; ?>">
+                <?php echo htmlspecialchars($mensaje); ?>
+            </div>
+        <?php endif; ?>
+        
+        <div class="appointment-section">
+            <div class="calendar-container">
+                <h2 class="section-title"><i class="far fa-calendar-alt"></i> Calendario de Citas</h2>
+                <div class="info-message">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Haga clic en un día disponible para seleccionar la fecha de su cita</span>
+                </div>
+                
+                <div class="calendar-header">
+                    <button class="nav-btn" id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                    <div class="month-year" id="month-year"></div>
+                    <button class="nav-btn" id="next-month"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                
+                <div class="calendar-weekdays">
+                    <div>Dom</div>
+                    <div>Lun</div>
+                    <div>Mar</div>
+                    <div>Mié</div>
+                    <div>Jue</div>
+                    <div>Vie</div>
+                    <div>Sáb</div>
+                </div>
+                
+                <div class="calendar-days" id="calendar-days">
+                    <!-- Los días se generarán con JavaScript -->
+                </div>
+            </div>
 
-  <!-- MODAL PARA AGENDAR -->
-  <div class="modal fade" id="citaModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content" style="border-radius:12px;">
-        <div class="modal-header">
-          <h5 class="modal-title">Agendar cita</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            <!-- Formulario de cita -->            
+            <div class="form-container" id="form-container">
+                <h2 class="section-title"><i class="far fa-edit"></i> Formulario de Cita</h2>
+                
+                <div class="selected-date-info">
+                    <div>Fecha seleccionada: <span id="selected-date-display">No se ha seleccionado ninguna fecha</span></div>
+                    <button class="btn-secondary" id="change-date" style="display:none;">Cambiar fecha</button>
+                </div>
+                
+                <form id="formCita" action="../controlador/Registroagenda.php" method="POST">
+                    <input type="hidden" name="fechaInput" id="fechaInputHidden">
+                    
+                    <div class="form-group">
+                        <label for="nombreInput"><i class="fas fa-user"></i> Nombre del paciente *</label>
+                        <input type="text" id="nombreInput" name="nombreInput" required placeholder="Ingrese su nombre completo">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="correoInput"><i class="fas fa-envelope"></i> Correo electrónico *</label>
+                        <input type="email" id="correoInput" name="correoInput" required placeholder="ejemplo@correo.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tituloInput"><i class="fas fa-stethoscope"></i> Título de la cita *</label>
+                        <input type="text" id="tituloInput" name="tituloInput" required placeholder="Ej: Consulta de rutina, Revisión, etc.">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcionInput"><i class="fas fa-comment-medical"></i> Descripción de la cita</label>
+                        <textarea id="descripcionInput" name="descripcionInput" rows="3" placeholder="Describa brevemente el motivo de la cita"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipoSelect"><i class="fas fa-tag"></i> Tipo de cita *</label>
+                        <select id="tipoSelect" name="tipoInput" class="form-select" required>
+                            <option value="">Selecciona...</option>
+                            <option value="Consulta">Consulta General</option>
+                            <option value="Examen">Examen Médico</option>
+                            <option value="Urgencia">Urgencia</option>
+                            <option value="Especialista">Especialista</option>
+                            <option value="Control">Control</option>
+                        </select>
+                    </div>
+          
+                    <div class="button-group">
+                        <button type="submit" class="btn btn-primary">Agendar Cita</button>
+                        <button type="button" class="btn btn-secondary" id="cancel-btn">Cancelar</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="modal-body">
-          <form id="formCita" class="needs-validation" novalidate>
-            <input type="hidden" id="fechaInput">
-            
-            <!-- Información del médico seleccionado -->
-            <div id="infoMedico" class="horario-info" style="display: none;">
-              <strong>Médico seleccionado:</strong>
-              <span id="nombreMedicoTexto"></span><br>
-              <strong>Horario:</strong>
-              <span id="horarioMedicoTexto"></span><br>
-              <strong>Días de trabajo:</strong>
-              <span id="diasMedicoTexto"></span>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Nombre del paciente</label>
-              <input type="text" id="nombreInput" class="form-control" required>
-              <div class="invalid-feedback">Por favor ingresa el nombre del paciente.</div>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Seleccionar Médico</label>
-              <select id="medicoSelect" class="form-select" required>
-                <option value="">Seleccione un médico...</option>
-              </select>
-              <div class="invalid-feedback">Selecciona un médico.</div>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Hospital Asignado</label>
-              <input type="text" id="hospitalAsignado" class="form-control" readonly>
-              <small class="text-muted">Este campo se llena automáticamente al seleccionar el médico</small>
-            </div>
-            
-            <div class="mb-3">
-              <label class="form-label">Hora de la cita</label>
-              <input type="time" id="horaInput" class="form-control" required>
-              <div class="invalid-feedback">Selecciona una hora válida.</div>
-              <div id="errorHorario" class="error-horario">
-                El horario seleccionado está fuera del horario de atención del médico.
-              </div>
-              <div id="errorDia" class="error-dia">
-                El médico no trabaja este día de la semana.
-              </div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Correo electrónico</label>
-              <input type="email" id="correoInput" class="form-control" required>
-              <div class="invalid-feedback">Ingresa un correo válido.</div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Título de la cita</label>
-              <input type="text" id="tituloInput" class="form-control" required>
-              <div class="invalid-feedback">Ingresa un título para la cita.</div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Descripción</label>
-              <textarea id="descripcionInput" class="form-control" rows="3" required></textarea>
-              <div class="invalid-feedback">Agrega una breve descripción.</div>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Tipo de cita</label>
-              <select id="tipoSelect" class="form-select" required>
-                <option value="">Selecciona...</option>
-                <option>Consulta</option>
-                <option>Examen</option>
-                <option>Urgencia</option>
-              </select>
-              <div class="invalid-feedback">Selecciona el tipo de cita.</div>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Confirmar cita</button>
-          </form>
-        </div>
-      </div>
+        
+        <footer>
+            <p>© 2023 Sistema de Agendamiento de Citas Médicas. Todos los derechos reservados.</p>
+            <p><i class="fas fa-phone"></i> Para asistencia, contacte al: 01-800-123-4567</p>
+        </footer>
     </div>
-  </div>
 
-  <!-- SCRIPTS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script>
-    // ========== SISTEMA DE VALIDACIÓN DE HORARIOS Y DÍAS ==========
-
-    // Función para validar horario de cita vs horario del médico
-    function validarHorarioCita(medicoId, horaCita) {
-        const medicos = JSON.parse(localStorage.getItem("medicos")) || [];
-        const medico = medicos.find(m => m.id === medicoId);
+    <script>
+        // ========== CALENDARIO ==========
+        let currentDate = new Date();
+        let selectedDate = null;
         
-        if (!medico || !medico.horarioInicio || !medico.horarioFin) {
-            return { valido: false, mensaje: "No se pudo obtener el horario del médico" };
-        }
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                          "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         
-        // Convertir horarios a minutos para comparación
-        const horaCitaMinutos = convertirHoraAMinutos(horaCita);
-        const horarioInicioMinutos = convertirHoraAMinutos(medico.horarioInicio);
-        const horarioFinMinutos = convertirHoraAMinutos(medico.horarioFin);
+        const dayNames = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
         
-        if (horaCitaMinutos >= horarioInicioMinutos && horaCitaMinutos <= horarioFinMinutos) {
-            return { valido: true, mensaje: "Horario válido" };
-        } else {
-            return { 
-                valido: false, 
-                mensaje: `El médico atiende de ${formatearHoraDisplay(medico.horarioInicio)} a ${formatearHoraDisplay(medico.horarioFin)}` 
-            };
-        }
-    }
-
-    // Función para validar día de la cita vs días de trabajo del médico
-    function validarDiaCita(medicoId, fechaCita) {
-        const medicos = JSON.parse(localStorage.getItem("medicos")) || [];
-        const medico = medicos.find(m => m.id === medicoId);
-        
-        if (!medico || !medico.diasTrabajo || !Array.isArray(medico.diasTrabajo)) {
-            return { valido: false, mensaje: "No se pudo obtener los días de trabajo del médico" };
-        }
-        
-        const fecha = new Date(fechaCita);
-        const nombreDia = obtenerNombreDia(fecha);
-        
-        if (medico.diasTrabajo.includes(nombreDia)) {
-            return { valido: true, mensaje: "Día válido" };
-        } else {
-            return { 
-                valido: false, 
-                mensaje: `El médico no trabaja los ${nombreDia}. Días de trabajo: ${medico.diasTrabajo.join(', ')}` 
-            };
-        }
-    }
-
-    // Función auxiliar para convertir hora a minutos
-    function convertirHoraAMinutos(hora) {
-        const [horas, minutos] = hora.split(':').map(Number);
-        return horas * 60 + minutos;
-    }
-
-    // Función para formatear hora para display
-    function formatearHoraDisplay(hora) {
-        if (!hora) return '';
-        const [horas, minutos] = hora.split(':');
-        const horaNum = parseInt(horas);
-        const ampm = horaNum >= 12 ? 'PM' : 'AM';
-        const hora12 = horaNum % 12 || 12;
-        return `${hora12}:${minutos} ${ampm}`;
-    }
-
-    // Función para obtener nombre del día en español
-    function obtenerNombreDia(fecha) {
-        const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-        return dias[fecha.getDay()];
-    }
-
-    // ========== SISTEMA DE SELECCIÓN DE MÉDICOS ==========
-
-    // Función para cargar médicos en el select
-    function cargarMedicosEnSelect() {
-        const medicoSelect = document.getElementById('medicoSelect');
-        const hospitalAsignado = document.getElementById('hospitalAsignado');
-        const infoMedico = document.getElementById('infoMedico');
-        const nombreMedicoTexto = document.getElementById('nombreMedicoTexto');
-        const horarioMedicoTexto = document.getElementById('horarioMedicoTexto');
-        const diasMedicoTexto = document.getElementById('diasMedicoTexto');
-        
-        // Limpiar opciones existentes (excepto la primera)
-        while (medicoSelect.options.length > 1) {
-            medicoSelect.remove(1);
-        }
-        
-        // Obtener datos
-        const medicos = JSON.parse(localStorage.getItem("medicos")) || [];
-        const hospitales = JSON.parse(localStorage.getItem("hospitales")) || [];
-        
-        if (medicos.length === 0) {
-            const option = document.createElement('option');
-            option.value = '';
-            option.textContent = 'No hay médicos disponibles';
-            medicoSelect.appendChild(option);
-            return;
-        }
-        
-        // Agregar médicos al select
-        medicos.forEach(medico => {
-            const hospitalesDelMedico = hospitales.filter(hospital => 
-                hospital.medicos && hospital.medicos.includes(medico.id)
-            );
+        function updateCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
             
-            const option = document.createElement('option');
-            option.value = medico.id;
-            option.textContent = `${medico.nombre} - ${medico.especialidad}`;
+            // Actualizar mes y año en el encabezado
+            document.getElementById('month-year').textContent = `${monthNames[month]} ${year}`;
             
-            // Guardar datos adicionales en el option
-            option.dataset.nombre = medico.nombre;
-            option.dataset.especialidad = medico.especialidad;
-            option.dataset.hospitales = hospitalesDelMedico.map(h => h.nombre).join(', ');
-            option.dataset.telefono = medico.telefono || '';
-            option.dataset.horarioInicio = medico.horarioInicio || '';
-            option.dataset.horarioFin = medico.horarioFin || '';
-            option.dataset.diasTrabajo = medico.diasTrabajo ? medico.diasTrabajo.join(',') : '';
+            // Obtener primer día del mes
+            const firstDay = new Date(year, month, 1);
+            // Obtener último día del mes
+            const lastDay = new Date(year, month + 1, 0);
+            // Días en el mes
+            const daysInMonth = lastDay.getDate();
+            // Día de la semana del primer día (0 = Domingo, 6 = Sábado)
+            const startingDay = firstDay.getDay();
             
-            medicoSelect.appendChild(option);
-        });
-        
-        // Agregar event listener para mostrar información del médico
-        medicoSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const hospitalesTexto = selectedOption.dataset.hospitales || 'No asignado a hospital';
-            hospitalAsignado.value = hospitalesTexto;
+            // Limpiar calendario
+            const calendarDays = document.getElementById('calendar-days');
+            calendarDays.innerHTML = '';
             
-            // Mostrar u ocultar información del médico
-            if (selectedOption.value) {
-                const horarioInicio = formatearHoraDisplay(selectedOption.dataset.horarioInicio);
-                const horarioFin = formatearHoraDisplay(selectedOption.dataset.horarioFin);
-                const diasTrabajo = selectedOption.dataset.diasTrabajo ? selectedOption.dataset.diasTrabajo.split(',').join(', ') : 'No definido';
+            // Añadir días vacíos al inicio
+            for (let i = 0; i < startingDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                calendarDays.appendChild(emptyDay);
+            }
+            
+            // Obtener fecha actual
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Añadir días del mes
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
                 
-                nombreMedicoTexto.textContent = selectedOption.dataset.nombre;
-                horarioMedicoTexto.textContent = `${horarioInicio} a ${horarioFin}`;
-                diasMedicoTexto.textContent = diasTrabajo;
-                infoMedico.style.display = 'block';
-            } else {
-                infoMedico.style.display = 'none';
-            }
-            
-            // Actualizar título de la cita
-            if (selectedOption.value) {
-                const tituloInput = document.getElementById('tituloInput');
-                if (!tituloInput.value) {
-                    tituloInput.value = `Consulta con ${selectedOption.dataset.nombre}`;
-                }
-            }
-            
-            // Validar fecha y hora actual si ya hay valores seleccionados
-            const fechaInput = document.getElementById('fechaInput');
-            const horaInput = document.getElementById('horaInput');
-            
-            if (fechaInput.value && selectedOption.value) {
-                validarYMostrarErrorDia(selectedOption.value, fechaInput.value);
-            }
-            
-            if (horaInput.value && selectedOption.value) {
-                validarYMostrarErrorHorario(selectedOption.value, horaInput.value);
-            }
-        });
-        
-        // Validar en tiempo real cuando cambia la hora
-        const horaInput = document.getElementById('horaInput');
-        horaInput.addEventListener('change', function() {
-            const medicoSelect = document.getElementById('medicoSelect');
-            const selectedOption = medicoSelect.options[medicoSelect.selectedIndex];
-            if (selectedOption.value) {
-                validarYMostrarErrorHorario(selectedOption.value, this.value);
-            }
-        });
-    }
-
-    // Función para validar y mostrar error de horario
-    function validarYMostrarErrorHorario(medicoId, horaCita) {
-        const errorHorario = document.getElementById('errorHorario');
-        const validacion = validarHorarioCita(medicoId, horaCita);
-        
-        if (!validacion.valido) {
-            errorHorario.textContent = validacion.mensaje;
-            errorHorario.style.display = 'block';
-            return false;
-        } else {
-            errorHorario.style.display = 'none';
-            return true;
-        }
-    }
-
-    // Función para validar y mostrar error de día
-    function validarYMostrarErrorDia(medicoId, fechaCita) {
-        const errorDia = document.getElementById('errorDia');
-        const validacion = validarDiaCita(medicoId, fechaCita);
-        
-        if (!validacion.valido) {
-            errorDia.textContent = validacion.mensaje;
-            errorDia.style.display = 'block';
-            return false;
-        } else {
-            errorDia.style.display = 'none';
-            return true;
-        }
-    }
-
-    // ========== CALENDARIO Y GESTIÓN DE CITAS ==========
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const calendarEl = document.getElementById('calendar');
-      const modalEl = document.getElementById('citaModal');
-      const modal = new bootstrap.Modal(modalEl);
-      const today = new Date().toISOString().split('T')[0];
-
-      // Utilidades de almacenamiento
-      function getCitas(){ return JSON.parse(localStorage.getItem("citas")) || []; }
-      function setCitas(citas){ localStorage.setItem("citas", JSON.stringify(citas)); }
-
-      function mapearEventos() {
-        return getCitas().map((cita, idx) => ({
-          id: cita.id || idx.toString(),
-          title: cita.titulo || cita.medico,
-          start: `${cita.fecha}T${cita.hora}`,
-          extendedProps: {
-            nombre: cita.nombre,
-            correo: cita.correo,
-            medico: cita.medico,
-            especialidad: cita.especialidad,
-            hospital: cita.hospital,
-            descripcion: cita.descripcion,
-            tipo: cita.tipo
-          }
-        }));
-      }
-
-      // Inicialización del calendario
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'es',
-        selectable: true,
-        navLinks: true,
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        buttonText: {
-          today: 'Hoy',
-          month: 'Mes',
-          week: 'Semana',
-          day: 'Día'
-        },
-        validRange: { start: today },
-        dateClick: function(info) {
-          const fechaSel = info.dateStr;
-          if (fechaSel < today) {
-            alert("No puedes agendar en días anteriores al de hoy.");
-            return;
-          }
-          document.getElementById('fechaInput').value = fechaSel;
-          const form = document.getElementById('formCita');
-          form.reset();
-          form.classList.remove('was-validated');
-          
-          // Resetear campos específicos
-          document.getElementById('hospitalAsignado').value = '';
-          document.getElementById('infoMedico').style.display = 'none';
-          document.getElementById('errorHorario').style.display = 'none';
-          document.getElementById('errorDia').style.display = 'none';
-          
-          // Cargar médicos y validar día si ya hay médico seleccionado
-          cargarMedicosEnSelect();
-          
-          modal.show();
-        },
-        events: mapearEventos(),
-        eventClick: function(info) {
-          const evento = info.event;
-          const props = evento.extendedProps;
-          const rol = localStorage.getItem("rolUsuario");
-
-          const resumen = `
-Cita: ${evento.title}
-Fecha: ${evento.startStr}
-Paciente: ${props.nombre}
-Correo: ${props.correo}
-Médico: ${props.medico}
-Especialidad: ${props.especialidad || 'No especificada'}
-Hospital: ${props.hospital || 'No asignado'}
-Tipo: ${props.tipo}
-Descripción: ${props.descripcion}
-          `.trim();
-
-          if (rol === 'admin') {
-            if (confirm(resumen + "\n\n¿Deseas eliminar esta cita?")) {
-              const citas = getCitas().filter(c => (c.id || '') !== evento.id);
-              setCitas(citas);
-              calendar.refetchEvents();
-              alert("Cita eliminada correctamente.");
-            }
-          } else {
-            alert(resumen);
-          }
-        }
-      });
-
-      calendar.render();
-
-      // Cargar médicos después de que el calendario se inicialice
-      setTimeout(() => {
-        cargarMedicosEnSelect();
-      }, 100);
-
-      // Guardado de la cita con validaciones completas
-      const form = document.getElementById('formCita');
-      form.addEventListener('submit', function(e){
-        if (!form.checkValidity()) {
-          e.preventDefault();
-          e.stopPropagation();
-          form.classList.add('was-validated');
-          return;
-        }
-        e.preventDefault();
-
-        const fecha = document.getElementById('fechaInput').value;
-        const nombre = document.getElementById('nombreInput').value.trim();
-        const medicoSelect = document.getElementById('medicoSelect');
-        const selectedOption = medicoSelect.options[medicoSelect.selectedIndex];
-        const hora = document.getElementById('horaInput').value;
-        const correo = document.getElementById('correoInput').value.trim();
-        const titulo = document.getElementById('tituloInput').value.trim();
-        const descripcion = document.getElementById('descripcionInput').value.trim();
-        const tipo = document.getElementById('tipoSelect').value;
-
-        const hoy = new Date().toISOString().split('T')[0];
-        if (!fecha || fecha < hoy) {
-          alert("No puedes agendar en días anteriores al de hoy.");
-          return;
-        }
-
-        // Validar que se seleccionó un médico
-        if (!selectedOption.value) {
-          alert("Por favor selecciona un médico.");
-          medicoSelect.focus();
-          return;
-        }
-
-        // Validar día de la cita
-        if (!validarYMostrarErrorDia(selectedOption.value, fecha)) {
-          alert("Por favor selecciona un día en el que el médico trabaje.");
-          return;
-        }
-
-        // Validar horario de la cita
-        if (!validarYMostrarErrorHorario(selectedOption.value, hora)) {
-          alert("Por favor selecciona un horario dentro del horario de atención del médico.");
-          document.getElementById('horaInput').focus();
-          return;
-        }
-
-        const nueva = {
-          id: 'c_' + Math.random().toString(36).slice(2, 10),
-          nombre,
-          medico: selectedOption.dataset.nombre,
-          medicoId: selectedOption.value,
-          especialidad: selectedOption.dataset.especialidad,
-          hospital: selectedOption.dataset.hospitales,
-          hora,
-          correo,
-          titulo,
-          descripcion,
-          tipo,
-          fecha
-        };
-
-        const citas = getCitas();
-        citas.push(nueva);
-        setCitas(citas);
-        modal.hide();
-        calendar.refetchEvents();
-        alert("Cita agendada correctamente.");
-      });
-    });
-  </script>
-  <script src="./js/navbar.js"></script>
-  <!-- Agregar este script en Agenda.php, después de la inicialización del calendario -->
-
-<script>
-// Control de acceso y personalización para Agenda.php
-document.addEventListener('DOMContentLoaded', function() {
-    const rolUsuario = localStorage.getItem('rolUsuario');
-    const medicoActual = localStorage.getItem('usuarioActual');
-    
-    if (rolUsuario === 'medico') {
-        // Personalizar el título para médicos
-        const titulo = document.querySelector('h1');
-        if (titulo) {
-            titulo.textContent = 'Mis Citas Agendadas';
-        }
-        
-        // Agregar mensaje informativo
-        const mensajeInfo = document.createElement('div');
-        mensajeInfo.className = 'alert alert-info mb-4';
-        mensajeInfo.innerHTML = `
-            <strong>Vista de médico:</strong> Solo puedes ver y gestionar tus propias citas agendadas.
-        `;
-        
-        const calendarEl = document.getElementById('calendar');
-        if (calendarEl) {
-            calendarEl.parentNode.insertBefore(mensajeInfo, calendarEl);
-        }
-        
-        // Personalizar el modal para médicos
-        const modalTitle = document.querySelector('#citaModal .modal-title');
-        if (modalTitle) {
-            modalTitle.textContent = 'Agendar Mi Cita';
-        }
-        
-        // Filtrar médicos en el select para que solo aparezca el médico actual
-        setTimeout(() => {
-            const medicoSelect = document.getElementById('medicoSelect');
-            if (medicoSelect && medicoActual) {
-                // Buscar la opción que coincide con el médico actual
-                for (let i = 0; i < medicoSelect.options.length; i++) {
-                    const option = medicoSelect.options[i];
-                    if (option.textContent.includes(medicoActual)) {
-                        medicoSelect.selectedIndex = i;
-                        // Disable el select para que no pueda cambiar de médico
-                        medicoSelect.disabled = true;
-                        break;
-                    }
+                const currentDay = new Date(year, month, day);
+                currentDay.setHours(0, 0, 0, 0);
+                
+                // Verificar si es hoy
+                if (currentDay.getTime() === today.getTime()) {
+                    dayElement.classList.add('today');
                 }
                 
-                // Si no encontró coincidencia, seleccionar el primero y deshabilitar
-                if (!medicoSelect.disabled) {
-                    medicoSelect.selectedIndex = 1; // Saltar la opción "Seleccione..."
-                    medicoSelect.disabled = true;
-                }
-                
-                // Agregar tooltip explicativo
-                medicoSelect.title = 'Usted está asignado como el médico para esta cita';
-            }
-        }, 1000);
-        
-        // Personalizar eventos del calendario para mostrar solo citas del médico
-        if (typeof calendar !== 'undefined') {
-            // Guardar referencia original de events
-            const originalEvents = calendar.getOption('events');
-            
-            // Filtrar eventos para mostrar solo los del médico actual
-            calendar.setOption('events', function(fetchInfo, successCallback, failureCallback) {
-                if (typeof originalEvents === 'function') {
-                    originalEvents(fetchInfo, function(events) {
-                        const eventosFiltrados = events.filter(evento => {
-                            const props = evento.extendedProps;
-                            return props.medico === medicoActual || 
-                                   props.medicoId === medicoActual ||
-                                   evento.title.includes(medicoActual);
-                        });
-                        successCallback(eventosFiltrados);
-                    }, failureCallback);
+                // Verificar si es una fecha pasada
+                if (currentDay < today) {
+                    dayElement.classList.add('past-day');
+                    dayElement.style.cursor = 'not-allowed';
+                    dayElement.title = 'No se pueden agendar citas en fechas pasadas';
                 } else {
-                    const eventos = originalEvents || [];
-                    const eventosFiltrados = eventos.filter(evento => {
-                        const props = evento.extendedProps;
-                        return props.medico === medicoActual || 
-                               props.medicoId === medicoActual ||
-                               evento.title.includes(medicoActual);
-                    });
-                    successCallback(eventosFiltrados);
+                    // Hacer clicable solo fechas futuras o hoy
+                    dayElement.addEventListener('click', () => selectDate(currentDay));
+                }
+                
+                // Resaltar fecha seleccionada
+                if (selectedDate && 
+                    currentDay.getDate() === selectedDate.getDate() &&
+                    currentDay.getMonth() === selectedDate.getMonth() &&
+                    currentDay.getFullYear() === selectedDate.getFullYear()) {
+                    dayElement.classList.add('selected-date');
+                }
+                
+                calendarDays.appendChild(dayElement);
+            }
+        }
+        
+        function selectDate(date) {
+            selectedDate = date;
+            updateCalendar();
+            
+            // Formatear fecha para mostrar
+            const formattedDate = `${dayNames[date.getDay()]}, ${date.getDate()} de ${monthNames[date.getMonth()]} de ${date.getFullYear()}`;
+            document.getElementById('selected-date-display').textContent = formattedDate;
+            
+            // Formatear fecha para el input hidden (YYYY-MM-DD)
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            document.getElementById('fechaInputHidden').value = `${year}-${month}-${day}`;
+            
+            // Mostrar botón para cambiar fecha
+            document.getElementById('change-date').style.display = 'inline-block';
+            
+            // Enfocar el primer campo del formulario
+            document.getElementById('nombreInput').focus();
+        }
+        
+        function changeDate() {
+            selectedDate = null;
+            document.getElementById('selected-date-display').textContent = 'No se ha seleccionado ninguna fecha';
+            document.getElementById('fechaInputHidden').value = '';
+            document.getElementById('change-date').style.display = 'none';
+            updateCalendar();
+        }
+        
+        // ========== INICIALIZACIÓN ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar calendario
+            updateCalendar();
+            
+            // Botones de navegación del calendario
+            document.getElementById('prev-month').addEventListener('click', function() {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                updateCalendar();
+            });
+            
+            document.getElementById('next-month').addEventListener('click', function() {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                updateCalendar();
+            });
+            
+            // Botón cambiar fecha
+            document.getElementById('change-date').addEventListener('click', changeDate);
+            
+            // Botón cancelar
+            document.getElementById('cancel-btn').addEventListener('click', function() {
+                if (confirm('¿Está seguro de que desea cancelar? Se perderán los datos ingresados.')) {
+                    changeDate();
+                    document.getElementById('formCita').reset();
                 }
             });
             
-            // Personalizar el eventClick para médicos
-            calendar.setOption('eventClick', function(info) {
-                const evento = info.event;
-                const props = evento.extendedProps;
-                
-                // Verificar si la cita pertenece al médico actual
-                if (props.medico !== medicoActual && !evento.title.includes(medicoActual)) {
-                    alert('Esta cita no pertenece a tu agenda. Solo puedes ver tus propias citas.');
+            // Validación del formulario
+            document.getElementById('formCita').addEventListener('submit', function(event) {
+                if (!selectedDate) {
+                    event.preventDefault();
+                    alert('Por favor seleccione una fecha en el calendario.');
                     return;
                 }
                 
-                const resumen = `
-Cita: ${evento.title}
-Fecha: ${evento.startStr}
-Paciente: ${props.nombre}
-Correo: ${props.correo}
-Médico: ${props.medico}
-Especialidad: ${props.especialidad || 'No especificada'}
-Hospital: ${props.hospital || 'No asignado'}
-Tipo: ${props.tipo}
-Descripción: ${props.descripcion}
-                `.trim();
-
-                alert(resumen);
-            });
-        }
-    }
-    
-    // Para administradores, mostrar todo sin restricciones
-    else if (rolUsuario === 'admin') {
-        const titulo = document.querySelector('h1');
-        if (titulo) {
-            titulo.textContent = 'Gestión Completa de Citas';
-        }
-        
-        // Asegurar que el select de médicos esté habilitado
-        setTimeout(() => {
-            const medicoSelect = document.getElementById('medicoSelect');
-            if (medicoSelect) {
-                medicoSelect.disabled = false;
-            }
-        }, 1000);
-    }
-    
-    // Para pacientes, personalizar título
-    else if (rolUsuario === 'paciente') {
-        const titulo = document.querySelector('h1');
-        if (titulo) {
-            titulo.textContent = 'Mis Citas Médicas';
-        }
-    }
-});
-</script>
-<script>
-// Función para guardar cita en la base de datos
-async function guardarCitaEnBD(citaData) {
-    try {
-        const formData = new FormData();
-        formData.append('nombre', citaData.nombre);
-        formData.append('medico', citaData.medico);
-        formData.append('medicoId', citaData.medicoId);
-        formData.append('especialidad', citaData.especialidad);
-        formData.append('hospital', citaData.hospital);
-        formData.append('hora', citaData.hora);
-        formData.append('correo', citaData.correo);
-        formData.append('titulo', citaData.titulo);
-        formData.append('descripcion', citaData.descripcion);
-        formData.append('tipo', citaData.tipo);
-        formData.append('fecha', citaData.fecha);
-
-        const response = await fetch('../controlador/guardar_cita.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        const result = await response.json();
-        
-        if (result.success) {
-            console.log('✅ Cita guardada en BD:', result.message);
-        } else {
-            console.error('❌ Error al guardar en BD:', result.message);
-        }
-    } catch (error) {
-        console.error('❌ Error de conexión:', error);
-    }
-}
-
-// Modificar el evento submit del formulario para guardar en BD
-document.addEventListener('DOMContentLoaded', function() {
-    const formCita = document.getElementById('formCita');
-    
-    if (formCita) {
-        // Guardar referencia original
-        const originalSubmit = formCita.onsubmit;
-        
-        formCita.onsubmit = function(e) {
-            if (!originalSubmit || originalSubmit.call(this, e) !== false) {
-                // Obtener datos del formulario
-                const fecha = document.getElementById('fechaInput').value;
-                const nombre = document.getElementById('nombreInput').value.trim();
-                const medicoSelect = document.getElementById('medicoSelect');
-                const selectedOption = medicoSelect.options[medicoSelect.selectedIndex];
-                const hora = document.getElementById('horaInput').value;
-                const correo = document.getElementById('correoInput').value.trim();
-                const titulo = document.getElementById('tituloInput').value.trim();
-                const descripcion = document.getElementById('descripcionInput').value.trim();
-                const tipo = document.getElementById('tipoSelect').value;
-
-                const citaData = {
-                    nombre: nombre,
-                    medico: selectedOption.dataset.nombre,
-                    medicoId: selectedOption.value,
-                    especialidad: selectedOption.dataset.especialidad,
-                    hospital: selectedOption.dataset.hospitales,
-                    hora: hora,
-                    correo: correo,
-                    titulo: titulo,
-                    descripcion: descripcion,
-                    tipo: tipo,
-                    fecha: fecha
-                };
-
-                // Guardar en BD
-                guardarCitaEnBD(citaData);
+                const fechaHidden = document.getElementById('fechaInputHidden').value;
+                if (!fechaHidden) {
+                    event.preventDefault();
+                    alert('Error: No se ha seleccionado una fecha válida.');
+                    return;
+                }
                 
-                return true;
-            }
-        };
-    }
-});
-</script>
+                // Validar que no sea fecha pasada
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const selected = new Date(fechaHidden);
+                
+                if (selected < today) {
+                    event.preventDefault();
+                    alert('No se pueden agendar citas en fechas pasadas.');
+                    return;
+                }
+                
+                // Si todo está bien, el formulario se envía
+            });
+        });
+    </script>
 </body>
 </html>
