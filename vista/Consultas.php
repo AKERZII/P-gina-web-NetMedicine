@@ -62,7 +62,7 @@ if ($userRole !== 'medico' && $userRole !== 'administrador') {
         </ul>
       </li>
       <li><a href="./Recetas.php">Recetas</a></li>
-      <li><a href="./Reportes.php">Reportes</a></li>
+      <li><a href="./Usuarios.php">Usuarios Registrados</a></li>
     </ul>
   </nav>
 

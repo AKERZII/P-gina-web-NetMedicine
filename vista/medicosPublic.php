@@ -264,7 +264,7 @@ try {
                                  onerror="this.src='./img/doctor1.jpg'">
                         <?php else: ?>
                             <div class="card-img-top no-image">
-                                <i class="fas fa-user-md"></i>
+                                <i class="fas fa-user-md"><img src="./img/medico.jpg" alt=""></i>
                             </div>
                         <?php endif; ?>
                         

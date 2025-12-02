@@ -58,9 +58,7 @@ if ($userRole !== 'medico' && $userRole !== 'administrador') {
     </div>
     
   </header>
-
-  <!-- NAVBAR -->
-  <nav class="navbar">
+<nav class="navbar">
     <ul class="menu">
       <li><a href="./src/principal.php">Inicio</a></li>
       <li><a href="./Medicos.php">Hospitales & Médicos</a></li>
@@ -78,7 +76,8 @@ if ($userRole !== 'medico' && $userRole !== 'administrador') {
           <li><a href="./Planificacion.php">Planificación Familiar</a></li>
         </ul>
       </li>
-      <li><a href="Recetas.php">Recetas</a></li>
+      <li><a href="./Recetas.php">Recetas</a></li>
+      <li><a href="./Usuarios.php">Usuarios Registrados</a></li>
     </ul>
   </nav>
 

@@ -109,29 +109,28 @@ try {
     </div>
 </header>
 
-<!-- NAVBAR -->
 <nav class="navbar">
     <ul class="menu">
-        <li><a href="./src/Principal.php">Inicio</a></li>
-        <li><a href="./Medicos.php">Médicos</a></li>
-        <li><a href="./Agenda.php">Agenda</a></li>
-        <li><a href="./Consultas.php">Consultas</a></li>
-
-        <li class="dropdown">
-            <a href="#">Servicios ▾</a>
-            <ul class="submenu">
-                <li><a href="./Consultas.php">Consultas</a></li>
-                <li><a href="./Hospitalizacion.php">Hospitalización</a></li>
-                <li><a href="./Laboratorio.php">Laboratorio Clínico</a></li>
-                <li><a href="./Rehabilitacion.php">Rehabilitación</a></li>
-                <li><a href="./SaludMental.php">Salud Mental</a></li>
-                <li><a href="./Farmacia.php">Farmacia</a></li>
-                <li><a href="./Urgencias.php">Urgencias</a></li>
-                <li><a href="./Planificacion.php">Planificación Familiar</a></li>
-            </ul>
-        </li>
+      <li><a href="./src/principal.php">Inicio</a></li>
+      <li><a href="./Medicos.php">Hospitales & Médicos</a></li>
+      <li><a href="./Agenda.php">Agenda</a></li>
+      <li><a href="./Consultas.php">Consultas</a></li>
+      <li class="dropdown">
+        <a href="#">Servicios ▾</a>
+        <ul class="submenu">
+          <li><a href="./Hospitalizacion.php">Hospitalización</a></li>
+          <li><a href="./Laboratorio.php">Laboratorio Clínico</a></li>
+          <li><a href="./Rehabilitacion.php">Rehabilitación</a></li>
+          <li><a href="./SaludMental.php">Salud Mental</a></li>
+          <li><a href="./Farmacia.php">Farmacia</a></li>
+          <li><a href="./Urgencias.php">Urgencias</a></li>
+          <li><a href="./Planificacion.php">Planificación Familiar</a></li>
+        </ul>
+      </li>
+      <li><a href="./Recetas.php">Recetas</a></li>
+      <li><a href="./Usuarios.php">Usuarios Registrados</a></li>
     </ul>
-</nav>
+  </nav>
 
 <!-- Contenido principal -->
 <div class="container mt-4">

@@ -110,7 +110,7 @@ if (isset($_SESSION['error_cita'])) {
         </ul>
       </li>
       <li><a href="./Recetas.php">Recetas</a></li>
-      <li><a href="./Reportes.php">Reportes</a></li>
+      <li><a href="./Usuarios.php">Reportes</a></li>
     </ul>
   </nav>
 
