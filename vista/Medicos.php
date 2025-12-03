@@ -11,7 +11,8 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 // Obtener médicos de la base de datos con información de hospital
 try {
     $query = "
-        SELECT 
+
+        SELECT
             m.id_medico,
             m.especialidad,
             m.horario,
