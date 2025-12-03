@@ -1,10 +1,7 @@
 <?php
 require_once '../modelo/Conexion.php';
-session_start();
 
 try {
-    $pdo = Conexion::conectar();
-    
     // Obtener todos los hospitales
     $stmt = $pdo->prepare("SELECT * FROM hospital");
     $stmt->execute();

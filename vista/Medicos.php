@@ -11,6 +11,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 // Obtener médicos de la base de datos con información de hospital
 try {
     $query = "
+
         SELECT
             m.id_medico,
             m.especialidad,
@@ -200,16 +201,29 @@ try {
         <div class="alert alert-warning text-center"><?php echo htmlspecialchars($error_medicos); ?></div>
     <?php endif; ?>
     
-    <!-- Barra de búsqueda -->
-    <div class="search-container">
-        <div class="input-group mb-3">
-            <input type="text" id="searchInput" class="form-control" placeholder="Buscar médico por nombre o especialidad...">
-            <button class="btn btn-outline-primary" type="button" id="searchBtn">
-                <i class="fas fa-search"></i> Buscar
-            </button>
+     <!-- Barra de búsqueda mejorada -->
+        <div class="search-container">
+            <h2>Buscar Médicos</h2>
+            <div class="input-group">
+                <input type="text" 
+                       id="searchInput" 
+                       class="form-control search-input" 
+                       placeholder="Buscar médico por nombre, especialidad o área...">
+                <button class="btn search-btn" type="button" id="searchBtn">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </div>
+            
+            <div class="buttons-group mt-3">
+                   <a href="./formulario.php" class="btn-login">
+                     <i class="fas fa-user-plus"></i> Agregar médico
+                   </a>
+                <a href="./Hospitales.php" class="btn-login">
+                     <i class="fas fa-hospital"></i> Ver hospitales
+                </a>
+            </div>
         </div>
-    </div>
-    
+
     <!-- Filtros por especialidad -->
     <div class="filter-buttons" id="filterButtons">
         <button class="filter-btn active" data-filter="all">Todos</button>
@@ -273,13 +287,6 @@ try {
                                 </div>
                             <?php endif; ?>
                             
-                            <!-- Botón ver perfil -->
-                            <div class="text-center mt-3">
-                                <a href="./perfil-medico.php?id=<?php echo $medico['id_medico']; ?>" 
-                                   class="btn-ver">
-                                    <i class="fas fa-user-circle"></i> Ver Perfil
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>

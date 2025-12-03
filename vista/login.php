@@ -169,7 +169,7 @@
           <option value="paciente">Paciente</option>
         </select>
 
-        <button type="submit" style="background-color: #28a745;">Registrarse</button>
+        <button type="submit" style="background-color: #4c7ea6;">Registrarse</button>
       </form>
 
       <div class="toggle-form">
