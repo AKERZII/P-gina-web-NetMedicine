@@ -14,8 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nombre = trim($_POST['nombre'] ?? '');
         $ubicacion = trim($_POST['ubicacion'] ?? '');
         $telefono = trim($_POST['telefono'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        $horario = trim($_POST['horario'] ?? '');
         
         // Validaciones
         if (empty($nombre) || empty($ubicacion) || empty($telefono)) {
@@ -24,11 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Insertar en la base de datos
         $stmt = $pdo->prepare("
-            INSERT INTO hospitales (ubicacion, telefono)
-            VALUES (?, ?,)
+            INSERT INTO hospital (nombre, ubicacion, telefono)
+            VALUES (?, ?, ?,)
         ");
         
-        $stmt->execute([$ubicacion, $telefono]);
+        $stmt->execute([$nombre, $ubicacion, $telefono]);
         
         echo json_encode([
             'success' => true,
