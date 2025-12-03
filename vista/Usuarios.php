@@ -11,7 +11,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 $userRole = $_SESSION['rol'] ?? 'paciente';
 
 // Permitir solo médicos y administradores
-if ($userRole !== 'medico' && $userRole !== 'administrador') {
+if ($userRole !== 'administrador') {
     header('Location: ./soloAdmin.php');
     exit;
 }
@@ -408,11 +408,7 @@ if (isset($_GET['busqueda']) && !empty($_GET['busqueda'])) {
                     <h1><i class="fas fa-users me-3"></i>Usuarios Registrados</h1>
                     <p class="lead">Gestión completa de usuarios del sistema</p>
                 </div>
-                <div class="col-md-4 text-end">
-                    <a href="registro.php" class="btn btn-light btn-lg">
-                        <i class="fas fa-user-plus me-2"></i>Nuevo Usuario
-                    </a>
-                </div>
+                
             </div>
         </div>
     </div>
