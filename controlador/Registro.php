@@ -28,11 +28,6 @@ if (strlen($password) < 6) {
 }
 
 try {
-    // Obtener conexión PDO (asumiendo que Conexion.php tiene una clase que la provee)
-    // Esto depende de cómo esté implementado tu Conexion.php
-    $conexion = new Conexion();
-    $pdo = $conexion->getConexion(); // o el método que uses para obtener PDO
-
     // Verificar si el correo o teléfono ya existen
     $sqlCheck = "SELECT id_usuario FROM usuario WHERE correo = ? OR telefono = ?";
     $stmtCheck = $pdo->prepare($sqlCheck);
@@ -45,9 +40,6 @@ try {
 
     // Iniciar transacción
     $pdo->beginTransaction();
-
-    // Hash de la contraseña
-    $password_hash = password_hash($password, PASSWORD_DEFAULT);
     
     // Insertar en tabla usuario
     $sqlUsuario = "INSERT INTO usuario (nombre, correo, password, telefono, rol) 
@@ -60,7 +52,7 @@ try {
     $stmtUsuario->execute([
         $nombreCompleto, 
         $correo, 
-        $password_hash,  // Contraseña hasheada
+        $password,
         $telefono, 
         $rol
     ]);
