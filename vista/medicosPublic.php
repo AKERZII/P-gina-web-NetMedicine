@@ -15,14 +15,11 @@ try {
             m.id_medico
             m.especialidad,
             m.horario,
-            h.nombre as hospital_nombre,
-            h.direccion as hospital_direccion,
-            u.nombre as usuario_nombre
+            u.nombre as usuario_nombre,
+            u.correo as usuario_correo
         FROM medicos m
-        LEFT JOIN hospitales h ON m.id_hospital = h.id_hospital
         LEFT JOIN usuario u ON m.id_usuario = u.id_usuario
-        WHERE u.correo = ?
-        ORDER BY m.nombre
+        WHERE m.activo=1
     ";
     
     $stmt = $pdo->prepare($query);
@@ -152,50 +149,47 @@ try {
 
 <body>
 
-<!-- Encabezado -->
-<header class="top-header">
+ <header class="top-header">
     <div class="logo"><img src="./img/Logo.jpg" alt="Logo Red Médica"></div>
-    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
-
+    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | contacto@redmedica.mx</p></div>
     <div class="login" id="loginArea">
-        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
         <div class="welcome">
             <h1>¡Bienvenido, <?php echo htmlspecialchars($_SESSION['nombre']); ?>!</h1>
             <p>Has iniciado sesión correctamente como: <?php echo htmlspecialchars($_SESSION['rol']); ?></p>
             <a href="../controlador/login.php" class="btn-login">Cerrar Sesión</a>
         </div>
-        <?php else: ?>
+    <?php else: ?>
         <div class="not-logged">
             <p>No has iniciado sesión.</p>
             <a href="../controlador/login.php" class="btn-login">Ir al Login</a>
         </div>
-        <?php endif; ?>
+    <?php endif; ?>
     </div>
-</header>
+  </header>
 
-<!-- NAVBAR -->
-<nav class="navbar">
+  <nav class="navbar">
     <ul class="menu">
-        <li><a href="./Principal.php">Inicio</a></li>
-        <li><a href="./Medicos.php">Médicos</a></li>
-        <li><a href="./Agenda.php">Agenda</a></li>
-        <li><a href="./Consultas.php">Consultas</a></li>
-
-        <li class="dropdown">
-            <a href="#">Servicios ▾</a>
-            <ul class="submenu">
-                <li><a href="./Consultas.php">Consultas</a></li>
-                <li><a href="./Hospitalizacion.php">Hospitalización</a></li>
-                <li><a href="./Laboratorio.php">Laboratorio Clínico</a></li>
-                <li><a href="./Rehabilitacion.php">Rehabilitación</a></li>
-                <li><a href="./SaludMental.php">Salud Mental</a></li>
-                <li><a href="./Farmacia.php">Farmacia</a></li>
-                <li><a href="./Urgencias.php">Urgencias</a></li>
-                <li><a href="./Planificacion.php">Planificación Familiar</a></li>
-            </ul>
-        </li>
+      <li><a href="./src/principal.php">Inicio</a></li>
+      <li><a href="./Medicos.php">Hospitales & Médicos</a></li>
+      <li><a href="./Agenda.php">Agenda</a></li>
+      <li><a href="./Consultas.php">Consultas</a></li>
+      <li class="dropdown">
+        <a href="#">Servicios ▾</a>
+        <ul class="submenu">
+          <li><a href="./Hospitalizacion.php">Hospitalización</a></li>
+          <li><a href="./Laboratorio.php">Laboratorio Clínico</a></li>
+          <li><a href="./Rehabilitacion.php">Rehabilitación</a></li>
+          <li><a href="./SaludMental.php">Salud Mental</a></li>
+          <li><a href="./Farmacia.php">Farmacia</a></li>
+          <li><a href="./Urgencias.php">Urgencias</a></li>
+          <li><a href="./Planificacion.php">Planificación Familiar</a></li>
+        </ul>
+      </li>
+      <li><a href="./Recetas.php">Recetas</a></li>
+      <li><a href="./Usuarios.php">Reportes</a></li>
     </ul>
-</nav>
+  </nav>
 
 <!-- Contenedor principal -->
 <div class="container mt-5">
@@ -264,7 +258,7 @@ try {
                                  onerror="this.src='./img/doctor1.jpg'">
                         <?php else: ?>
                             <div class="card-img-top no-image">
-                                <i class="fas fa-user-md"><img src="./img/medico.jpg" alt=""></i>
+                                <i class="fas fa-user-md"></i>
                             </div>
                         <?php endif; ?>
                         
@@ -377,21 +371,6 @@ try {
         
         // Inicializar filtros
         filterMedicos();
-        
-        // Si el usuario está logueado desde localStorage (para compatibilidad)
-        const usuarioActual = localStorage.getItem("usuarioActual");
-        if (usuarioActual && !document.querySelector('.welcome')) {
-            document.getElementById("loginArea").innerHTML = `
-                <div class="welcome">
-                    <p> Bienvenido, <strong>${usuarioActual}</strong></p>
-                    <button id="logoutBtn" class="btn-login">Cerrar Sesión</button>
-                </div>
-            `;
-            document.getElementById("logoutBtn").addEventListener("click", () => {
-                localStorage.removeItem("usuarioActual");
-                window.location.reload();
-            });
-        }
     });
 </script>
 </body>

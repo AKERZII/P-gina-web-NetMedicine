@@ -89,27 +89,26 @@ try {
 </div>
 
 <!-- Encabezado -->
-<header class="top-header">
+ <header class="top-header">
     <div class="logo"><img src="./img/Logo.jpg" alt="Logo Red Médica"></div>
-    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | ✉ contacto@redmedica.mx</p></div>
-
+    <div class="contacto"><p>Tel: +52 (33) 1234 5678 | contacto@redmedica.mx</p></div>
     <div class="login" id="loginArea">
-        <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
         <div class="welcome">
             <h1>¡Bienvenido, <?php echo htmlspecialchars($_SESSION['nombre']); ?>!</h1>
             <p>Has iniciado sesión correctamente como: <?php echo htmlspecialchars($_SESSION['rol']); ?></p>
-            <a href="../controlador/logout.php" class="btn-login">Cerrar Sesión</a>
+            <a href="../controlador/login.php" class="btn-login">Cerrar Sesión</a>
         </div>
-        <?php else: ?>
+    <?php else: ?>
         <div class="not-logged">
             <p>No has iniciado sesión.</p>
             <a href="../controlador/login.php" class="btn-login">Ir al Login</a>
         </div>
-        <?php endif; ?>
+    <?php endif; ?>
     </div>
-</header>
+  </header>
 
-<nav class="navbar">
+  <nav class="navbar">
     <ul class="menu">
       <li><a href="./src/principal.php">Inicio</a></li>
       <li><a href="./Medicos.php">Hospitales & Médicos</a></li>
@@ -128,10 +127,9 @@ try {
         </ul>
       </li>
       <li><a href="./Recetas.php">Recetas</a></li>
-      <li><a href="./Usuarios.php">Usuarios Registrados</a></li>
+      <li><a href="./Usuarios.php">Reportes</a></li>
     </ul>
   </nav>
-
 <!-- Contenido principal -->
 <div class="container mt-4">
     <?php if (isset($_SESSION['mensaje'])): ?>

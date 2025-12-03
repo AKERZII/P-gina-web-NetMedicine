@@ -20,22 +20,22 @@
     <div class="login" id="loginArea">
       <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
         <div class="welcome">
-            <h1>¡Bienvenido, <?php echo $_SESSION['nombre']; ?>!</h1>
-            <p>Has iniciado sesión correctamente como: <?php echo $_SESSION['rol']?></p>
-            <a href="../controlador/login.php"  class="btn-login">Cerrar Sesión</a>
+            <h1>¡Bienvenido, <?php echo htmlspecialchars($_SESSION['nombre']); ?>!</h1>
+            <p>Has iniciado sesión correctamente como: <?php echo htmlspecialchars($_SESSION['rol']); ?></p>
+            <a href="../controlador/login.php" class="btn-login">Cerrar Sesión</a>
         </div>
     <?php else: ?>
         <div class="not-logged">
             <p>No has iniciado sesión.</p>
-            <a href="../controlador/login.php"  class="btn-login">Ir al Login</a>
+            <a href="../controlador/login.php" class="btn-login">Ir al Login</a>
         </div>
     <?php endif; ?>
-  </div>
+    </div>
   </header>
 
   <nav class="navbar">
     <ul class="menu">
-      <li><a href="./src/Principal.php">Inicio</a></li>
+      <li><a href="./src/principal.php">Inicio</a></li>
       <li><a href="./Medicos.php">Hospitales & Médicos</a></li>
       <li><a href="./Agenda.php">Agenda</a></li>
       <li><a href="./Consultas.php">Consultas</a></li>
@@ -52,9 +52,9 @@
         </ul>
       </li>
       <li><a href="./Recetas.php">Recetas</a></li>
+      <li><a href="./Usuarios.php">Reportes</a></li>
     </ul>
   </nav>
-
   <div class="container">
     <h1 class="mb-4">Urgencias</h1>
     <img src="./img/urgencias.jpg" alt="Área de urgencias hospitalarias" class="hero-img">

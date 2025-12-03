@@ -4,7 +4,7 @@ require_once '../modelo/Conexion.php';
 
 // Verificar si el usuario está logueado y es médico
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true || ($_SESSION['rol'] !== 'medico' && $_SESSION['rol'] !== 'admin')) {
-    header('Location: ../src/vista/login.php');
+    header('Location: ../vista/login.php');
     exit;
 }
 

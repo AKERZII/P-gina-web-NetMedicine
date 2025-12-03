@@ -11,7 +11,7 @@ $userRole = $_SESSION['rol'] ?? 'paciente';
 
 // Permitir solo médicos y administradores
 if ($userRole !== 'medico' && $userRole !== 'administrador') {
-    header('Location: ./medicosPublic.php');
+    header('Location: ./soloAdmin.php');
     exit;
 }
 

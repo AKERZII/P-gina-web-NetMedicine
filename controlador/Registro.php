@@ -28,6 +28,11 @@ if (strlen($password) < 6) {
 }
 
 try {
+    // Obtener conexión PDO (asumiendo que Conexion.php tiene una clase que la provee)
+    // Esto depende de cómo esté implementado tu Conexion.php
+    $conexion = new Conexion();
+    $pdo = $conexion->getConexion(); // o el método que uses para obtener PDO
+
     // Verificar si el correo o teléfono ya existen
     $sqlCheck = "SELECT id_usuario FROM usuario WHERE correo = ? OR telefono = ?";
     $stmtCheck = $pdo->prepare($sqlCheck);
@@ -41,17 +46,26 @@ try {
     // Iniciar transacción
     $pdo->beginTransaction();
 
+    // Hash de la contraseña
+    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+    
     // Insertar en tabla usuario
     $sqlUsuario = "INSERT INTO usuario (nombre, correo, password, telefono, rol) 
                    VALUES (?, ?, ?, ?, ?)";
     $stmtUsuario = $pdo->prepare($sqlUsuario);
     
     $nombreCompleto = $nombre . ' ' . $apellido;
-    $passwordHash = password_hash($password, PASSWORD_DEFAULT);
     
-    $stmtUsuario->execute([$nombreCompleto, $correo, $telefono, $passwordHash, $rol]);
+    // CORREGIDO: Orden correcto de parámetros
+    $stmtUsuario->execute([
+        $nombreCompleto, 
+        $correo, 
+        $password_hash,  // Contraseña hasheada
+        $telefono, 
+        $rol
+    ]);
+    
     $id_usuario = $pdo->lastInsertId();
-
 
     // Confirmar transacción
     $pdo->commit();
@@ -61,7 +75,9 @@ try {
 
 } catch(PDOException $e) {
     // Revertir transacción en caso de error
-    $pdo->rollBack();
+    if (isset($pdo) && $pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     
     error_log("Error en registro: " . $e->getMessage());
 

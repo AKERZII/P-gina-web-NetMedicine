@@ -11,7 +11,7 @@ $userRole = $_SESSION['rol'] ?? 'paciente';
 
 // Permitir solo médicos y administradores
 if ($userRole !== 'medico' && $userRole !== 'administrador') {
-    header('Location: ./src/principal.php');
+    header('Location: ./soloAdmin.php');
     exit;
 }
 ?>
@@ -38,27 +38,26 @@ if ($userRole !== 'medico' && $userRole !== 'administrador') {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
-  <!-- ENCABEZADO -->
-  <header class="top-header">
-    <div class="logo"><img src="./img/Logo.jpg" alt="Logo"></div>
+   <header class="top-header">
+    <div class="logo"><img src="./img/Logo.jpg" alt="Logo Red Médica"></div>
     <div class="contacto"><p>Tel: +52 (33) 1234 5678 | contacto@redmedica.mx</p></div>
-   <div class="login" id="loginArea">
-       <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
+    <div class="login" id="loginArea">
+      <?php if (isset($_SESSION['logged_in']) && $_SESSION['logged_in']): ?>
         <div class="welcome">
-            <h1>¡Bienvenido, <?php echo $_SESSION['nombre']; ?>!</h1>
-            <p>Has iniciado sesión correctamente como: <?php echo $_SESSION['rol']?></p>
-            <a href="../controlador/logout.php"  class="btn-login">Cerrar Sesión</a>
+            <h1>¡Bienvenido, <?php echo htmlspecialchars($_SESSION['nombre']); ?>!</h1>
+            <p>Has iniciado sesión correctamente como: <?php echo htmlspecialchars($_SESSION['rol']); ?></p>
+            <a href="../controlador/login.php" class="btn-login">Cerrar Sesión</a>
         </div>
     <?php else: ?>
         <div class="not-logged">
             <p>No has iniciado sesión.</p>
-            <a href="../controlador/login.php"  class="btn-login">Iniciar sesión</a>
+            <a href="../controlador/login.php" class="btn-login">Ir al Login</a>
         </div>
     <?php endif; ?>
     </div>
-    
   </header>
-<nav class="navbar">
+
+  <nav class="navbar">
     <ul class="menu">
       <li><a href="./src/principal.php">Inicio</a></li>
       <li><a href="./Medicos.php">Hospitales & Médicos</a></li>
@@ -77,11 +76,9 @@ if ($userRole !== 'medico' && $userRole !== 'administrador') {
         </ul>
       </li>
       <li><a href="./Recetas.php">Recetas</a></li>
-      <li><a href="./Usuarios.php">Usuarios Registrados</a></li>
+      <li><a href="./Usuarios.php">Reportes</a></li>
     </ul>
   </nav>
-
-
   <!-- FORMULARIO DE RECETAS -->
   <div class="container">
     <h2 class="mb-4">Registrar Receta Médica</h2>

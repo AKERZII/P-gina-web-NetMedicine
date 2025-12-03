@@ -2,6 +2,20 @@
 session_start();
 require_once '../modelo/Conexion.php';
 
+if (!isset($pdo)) {
+        // Configuración de conexión si no viene de Conexion.php
+        $host = 'localhost';
+        $dbname = 'redmedica';
+        $username = 'root';
+        $password = '';
+        
+        $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+    
+    // Iniciar transacción
+    $pdo->beginTransaction();
+
 // Verificar si el usuario es administrador
 if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in'] || $_SESSION['rol'] !== 'administrador') {
     $_SESSION['mensaje'] = "No tiene permisos para realizar esta acción.";
@@ -21,10 +35,6 @@ if (!isset($_POST['id_hospital']) || empty($_POST['id_hospital'])) {
 $id_hospital = $_POST['id_hospital'];
 
 try {
-    $pdo = Conexion::conectar();
-    
-    // Iniciar transacción
-    $pdo->beginTransaction();
     
     // Primero, eliminar los médicos asociados al hospital
     $stmt = $pdo->prepare("DELETE FROM medico WHERE id_hospital = ?");
