@@ -1,26 +1,89 @@
 <?php
 session_start();
-require_once '../modelo/conexion.php';
+require_once '../modelo/Conexion.php';
 
-// Traer hospitales
-$stmt = $pdo->query("SELECT id_hospital, ubicacion FROM hospital");
-$hospitales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Verificar si el usuario está logueado y es administrador
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header('Location: login.php');
+    exit;
+}
 
-// Traer usuarios
-$stmt = $pdo->query("SELECT id_usuario, nombre FROM usuario");
-$usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$userRole = $_SESSION['rol'] ?? 'paciente';
+
+// Permitir solo administradores
+if ($userRole !== 'administrador') {
+    header('Location: ./soloAdmin.php');
+    exit;
+}
+
+// Función para obtener el próximo ID correcto
+function obtenerProximoIdHospital($pdo) {
+    try {
+        // Obtener el máximo ID actual
+        $stmt = $pdo->query("SELECT MAX(id_hospital) as max_id FROM hospital");
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($result && $result['max_id']) {
+            return intval($result['max_id']) + 1;
+        } else {
+            return 1; // Si no hay registros
+        }
+    } catch (PDOException $e) {
+        return 1; // En caso de error, empezar desde 1
+    }
+}
+
+// Obtener el próximo ID
+$proximo_id = obtenerProximoIdHospital($pdo);
+
+// Procesar el formulario si se envió
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $ubicacion = trim($_POST['ubicacion'] ?? '');
+    $telefono = trim($_POST['telefono'] ?? '');
+    
+    $errores = [];
+    
+    // Validaciones
+    if (empty($ubicacion)) {
+        $errores[] = "La ubicación es obligatoria";
+    }
+    
+    if (empty($telefono)) {
+        $errores[] = "El teléfono es obligatorio";
+    }
+    
+    // Si no hay errores, insertar en la base de datos
+    if (empty($errores)) {
+        try {
+            // Insertar con ID específico (sobreescribiendo AUTO_INCREMENT)
+            $stmt = $pdo->prepare("INSERT INTO hospital (id_hospital, ubicacion, telefono) VALUES (?, ?, ?)");
+            $stmt->execute([$proximo_id, $ubicacion, $telefono]);
+            
+            // Corregir el AUTO_INCREMENT para el próximo registro
+            $next_id = $proximo_id + 1;
+            $pdo->exec("ALTER TABLE hospital AUTO_INCREMENT = $next_id");
+            
+            $_SESSION['mensaje'] = "Hospital registrado exitosamente con ID: " . $proximo_id;
+            $_SESSION['tipo_mensaje'] = "success";
+            header('Location: Hospitales.php');
+            exit;
+        } catch (PDOException $e) {
+            $errores[] = "Error al registrar el hospital: " . $e->getMessage();
+        }
+    }
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Agregar Médico | Red Médica</title>
+    <title>Registrar Hospital | Red Médica</title>
     <link rel="stylesheet" href="./css/Principal.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* --- ESTILOS ESPECÍFICOS PARA FORMULARIO DE MÉDICO --- */
+        /* --- ESTILOS ESPECÍFICOS PARA FORMULARIO DE HOSPITAL --- */
         body {
             background-color: #f4f6f9;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -34,7 +97,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .medico-container {
+        .hospital-container {
             max-width: 600px;
             margin: 50px auto;
             background: #fff;
@@ -59,6 +122,33 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-size: 1.2rem;
         }
 
+        .id-info {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .id-info i {
+            color: #3498db;
+            font-size: 1.2rem;
+        }
+
+        .id-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .id-value {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 1.2rem;
+        }
+
         .form-group {
             margin-bottom: 25px;
         }
@@ -80,7 +170,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             text-align: center;
         }
 
-        .form-control, .form-select {
+        .form-control {
             width: 100%;
             padding: 12px 15px;
             border: 2px solid #ddd;
@@ -90,7 +180,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background-color: #f9fbfd;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus {
             border-color: #4c7ea6;
             box-shadow: 0 0 0 0.2rem rgba(76, 126, 166, 0.25);
             outline: none;
@@ -102,7 +192,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             font-style: italic;
         }
 
-        .btn-medico {
+        .btn-hospital {
             padding: 12px 25px;
             border: none;
             border-radius: 6px;
@@ -118,12 +208,12 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             text-align: center;
         }
 
-        .btn-guardar {
+        .btn-registrar {
             background-color: #3498db;
             color: white;
         }
 
-        .btn-guardar:hover {
+        .btn-registrar:hover {
             background-color: #2980b9;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
@@ -146,20 +236,38 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             margin-top: 30px;
         }
 
-        .info-message {
-            background-color: #e8f4fc;
-            border-left: 4px solid #3498db;
-            padding: 15px;
-            border-radius: 6px;
+        .alert-hospital {
+            padding: 15px 20px;
+            border-radius: 8px;
             margin-bottom: 25px;
+            border: none;
+        }
+
+        .alert-danger-hospital {
+            background-color: #fdeaea;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+        }
+
+        .alert-danger-hospital h5 {
+            margin-top: 0;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .info-message i {
-            color: #3498db;
-            font-size: 1.2rem;
+        .alert-danger-hospital ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+
+        .alert-danger-hospital li {
+            margin-bottom: 5px;
+        }
+
+        .alert-danger-hospital li:last-child {
+            margin-bottom: 0;
         }
 
         .error-message {
@@ -180,7 +288,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 768px) {
-            .medico-container {
+            .hospital-container {
                 margin: 20px;
                 padding: 20px;
             }
@@ -190,7 +298,7 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 gap: 10px;
             }
             
-            .btn-medico {
+            .btn-hospital {
                 width: 100%;
             }
             
@@ -200,17 +308,17 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         @media (max-width: 480px) {
-            .medico-container {
+            .hospital-container {
                 margin: 10px;
                 padding: 15px;
             }
             
-            .form-control, .form-select {
+            .form-control {
                 padding: 10px 12px;
                 font-size: 14px;
             }
             
-            .btn-medico {
+            .btn-hospital {
                 padding: 10px 20px;
                 font-size: 14px;
             }
@@ -262,91 +370,75 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </ul>
     </nav>
 
-    <!-- Formulario de registro de médico -->
-    <div class="medico-container">
+    <!-- Formulario de registro de hospital -->
+    <div class="hospital-container">
         <h2 class="form-title">
-            <i class="fas fa-user-md form-icon"></i> Agregar Nuevo Médico
+            <i class="fas fa-hospital form-icon"></i> Registrar Nuevo Hospital
         </h2>
         
-        <div class="info-message">
+        <?php if (!empty($errores)): ?>
+            <div class="alert-hospital alert-danger-hospital">
+                <h5><i class="fas fa-exclamation-triangle"></i> Errores:</h5>
+                <ul class="mb-0">
+                    <?php foreach ($errores as $error): ?>
+                        <li><?php echo htmlspecialchars($error); ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
+        
+        <!-- Información del ID automático -->
+        <div class="id-info">
             <i class="fas fa-info-circle"></i>
             <div>
-                <p style="margin: 0; font-weight: 600;">Complete todos los campos para registrar un nuevo médico en el sistema.</p>
-                <p style="margin: 5px 0 0 0; font-size: 0.9em;">Seleccione el hospital y el usuario que será asignado como médico.</p>
+                <span class="id-label">Próximo ID que se asignará:</span>
+                <span class="id-value">Hospital <?php echo htmlspecialchars($proximo_id); ?></span>
+                <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #666;">
+                    El ID se asignará automáticamente siguiendo la secuencia numérica.
+                </p>
             </div>
         </div>
         
-        <form action="../controlador/registrarmedico.php" method="POST" id="formMedico">
-
+        <form method="POST" action="" id="formHospital" novalidate>
+            <!-- Ubicación -->
             <div class="form-group">
-                <label for="especialidad" class="form-label">
-                    <i class="fas fa-stethoscope"></i> Especialidad *
+                <label for="ubicacion" class="form-label">
+                    <i class="fas fa-map-marker-alt"></i> Ubicación *
                 </label>
                 <input type="text" 
-                       name="especialidad" 
                        class="form-control" 
-                       id="especialidad"
-                       placeholder="Ej: Cardiología, Pediatría, Medicina General"
-                       required>
-                <div class="error-message" id="errorEspecialidad"></div>
+                       id="ubicacion" 
+                       name="ubicacion"
+                       value="<?php echo htmlspecialchars($_POST['ubicacion'] ?? ''); ?>"
+                       placeholder="Ej: Av. Principal #123, Ciudad, Estado"
+                       required
+                       maxlength="200">
+                <div class="error-message" id="errorUbicacion"></div>
             </div>
-
+            
+            <!-- Teléfono -->
             <div class="form-group">
-                <label for="horario" class="form-label">
-                    <i class="far fa-clock"></i> Horario *
+                <label for="telefono" class="form-label">
+                    <i class="fas fa-phone"></i> Teléfono *
                 </label>
-                <input type="text" 
-                       name="horario" 
+                <input type="tel" 
                        class="form-control" 
-                       id="horario"
-                       placeholder="Ej: Lunes a Viernes 9:00 - 17:00"
-                       required>
-                <div class="error-message" id="errorHorario"></div>
+                       id="telefono" 
+                       name="telefono"
+                       value="<?php echo htmlspecialchars($_POST['telefono'] ?? ''); ?>"
+                       placeholder="Ej: +52 (33) 1234 5678"
+                       required
+                       maxlength="20">
+                <div class="error-message" id="errorTelefono"></div>
             </div>
-
-            <div class="form-group">
-                <label for="id_hospital" class="form-label">
-                    <i class="fas fa-hospital"></i> Hospital *
-                </label>
-                <select name="id_hospital" 
-                        class="form-select" 
-                        id="id_hospital" 
-                        required>
-                    <option value="">Seleccione un hospital</option>
-                    <?php foreach ($hospitales as $h): ?>
-                        <option value="<?= htmlspecialchars($h['id_hospital']) ?>">
-                            <?= htmlspecialchars($h['ubicacion']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <div class="error-message" id="errorHospital"></div>
-            </div>
-
-            <div class="form-group">
-                <label for="id_usuario" class="form-label">
-                    <i class="fas fa-user"></i> Usuario asignado *
-                </label>
-                <select name="id_usuario" 
-                        class="form-select" 
-                        id="id_usuario" 
-                        required>
-                    <option value="">Seleccione usuario</option>
-                    <?php foreach ($usuarios as $u): ?>
-                        <option value="<?= htmlspecialchars($u['id_usuario']) ?>">
-                            <?= htmlspecialchars($u['nombre']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                <div class="error-message" id="errorUsuario"></div>
-            </div>
-
+            
             <!-- Botones -->
             <div class="button-group">
-                <a href="Medicos.php" class="btn-medico btn-volver">
+                <a href="Hospitales.php" class="btn-hospital btn-volver">
                     <i class="fas fa-arrow-left"></i> Volver
                 </a>
-                <button type="submit" class="btn-medico btn-guardar">
-                    <i class="fas fa-save"></i> Guardar Médico
+                <button type="submit" class="btn-hospital btn-registrar">
+                    <i class="fas fa-save"></i> Registrar Hospital
                 </button>
             </div>
         </form>
@@ -355,60 +447,38 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Script de validación -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('formMedico');
-            const especialidad = document.getElementById('especialidad');
-            const horario = document.getElementById('horario');
-            const idHospital = document.getElementById('id_hospital');
-            const idUsuario = document.getElementById('id_usuario');
+            const form = document.getElementById('formHospital');
+            const ubicacion = document.getElementById('ubicacion');
+            const telefono = document.getElementById('telefono');
             
             // Validación en tiempo real
-            especialidad.addEventListener('blur', function() {
-                const errorEspecialidad = document.getElementById('errorEspecialidad');
+            ubicacion.addEventListener('blur', function() {
+                const errorUbicacion = document.getElementById('errorUbicacion');
                 if (this.value.trim() === '') {
-                    errorEspecialidad.textContent = 'La especialidad es obligatoria';
+                    errorUbicacion.textContent = 'La ubicación es obligatoria';
                     this.classList.add('is-invalid');
                     this.classList.remove('is-valid');
                 } else {
-                    errorEspecialidad.textContent = '';
+                    errorUbicacion.textContent = '';
                     this.classList.remove('is-invalid');
                     this.classList.add('is-valid');
                 }
             });
             
-            horario.addEventListener('blur', function() {
-                const errorHorario = document.getElementById('errorHorario');
+            telefono.addEventListener('blur', function() {
+                const errorTelefono = document.getElementById('errorTelefono');
+                const telefonoPattern = /^[\+\d\s\(\)\-]+$/;
+                
                 if (this.value.trim() === '') {
-                    errorHorario.textContent = 'El horario es obligatorio';
+                    errorTelefono.textContent = 'El teléfono es obligatorio';
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else if (!telefonoPattern.test(this.value)) {
+                    errorTelefono.textContent = 'Formato de teléfono inválido';
                     this.classList.add('is-invalid');
                     this.classList.remove('is-valid');
                 } else {
-                    errorHorario.textContent = '';
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
-                }
-            });
-            
-            idHospital.addEventListener('change', function() {
-                const errorHospital = document.getElementById('errorHospital');
-                if (this.value === '') {
-                    errorHospital.textContent = 'Debe seleccionar un hospital';
-                    this.classList.add('is-invalid');
-                    this.classList.remove('is-valid');
-                } else {
-                    errorHospital.textContent = '';
-                    this.classList.remove('is-invalid');
-                    this.classList.add('is-valid');
-                }
-            });
-            
-            idUsuario.addEventListener('change', function() {
-                const errorUsuario = document.getElementById('errorUsuario');
-                if (this.value === '') {
-                    errorUsuario.textContent = 'Debe seleccionar un usuario';
-                    this.classList.add('is-invalid');
-                    this.classList.remove('is-valid');
-                } else {
-                    errorUsuario.textContent = '';
+                    errorTelefono.textContent = '';
                     this.classList.remove('is-invalid');
                     this.classList.add('is-valid');
                 }
@@ -418,35 +488,25 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
             form.addEventListener('submit', function(e) {
                 let valid = true;
                 
-                // Validar especialidad
-                if (especialidad.value.trim() === '') {
-                    document.getElementById('errorEspecialidad').textContent = 'La especialidad es obligatoria';
-                    especialidad.classList.add('is-invalid');
-                    especialidad.classList.remove('is-valid');
+                // Validar ubicación
+                if (ubicacion.value.trim() === '') {
+                    document.getElementById('errorUbicacion').textContent = 'La ubicación es obligatoria';
+                    ubicacion.classList.add('is-invalid');
+                    ubicacion.classList.remove('is-valid');
                     valid = false;
                 }
                 
-                // Validar horario
-                if (horario.value.trim() === '') {
-                    document.getElementById('errorHorario').textContent = 'El horario es obligatorio';
-                    horario.classList.add('is-invalid');
-                    horario.classList.remove('is-valid');
+                // Validar teléfono
+                const telefonoPattern = /^[\+\d\s\(\)\-]+$/;
+                if (telefono.value.trim() === '') {
+                    document.getElementById('errorTelefono').textContent = 'El teléfono es obligatorio';
+                    telefono.classList.add('is-invalid');
+                    telefono.classList.remove('is-valid');
                     valid = false;
-                }
-                
-                // Validar hospital
-                if (idHospital.value === '') {
-                    document.getElementById('errorHospital').textContent = 'Debe seleccionar un hospital';
-                    idHospital.classList.add('is-invalid');
-                    idHospital.classList.remove('is-valid');
-                    valid = false;
-                }
-                
-                // Validar usuario
-                if (idUsuario.value === '') {
-                    document.getElementById('errorUsuario').textContent = 'Debe seleccionar un usuario';
-                    idUsuario.classList.add('is-invalid');
-                    idUsuario.classList.remove('is-valid');
+                } else if (!telefonoPattern.test(telefono.value)) {
+                    document.getElementById('errorTelefono').textContent = 'Formato de teléfono inválido';
+                    telefono.classList.add('is-invalid');
+                    telefono.classList.remove('is-valid');
                     valid = false;
                 }
                 
@@ -461,24 +521,12 @@ $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 }
             });
             
-            // Limpiar validación al escribir/seleccionar
-            const inputs = [especialidad, horario];
-            const selects = [idHospital, idUsuario];
-            
+            // Limpiar validación al escribir
+            const inputs = [ubicacion, telefono];
             inputs.forEach(input => {
                 input.addEventListener('input', function() {
                     if (this.classList.contains('is-invalid')) {
-                        const errorId = this.id === 'especialidad' ? 'errorEspecialidad' : 'errorHorario';
-                        document.getElementById(errorId).textContent = '';
-                        this.classList.remove('is-invalid');
-                    }
-                });
-            });
-            
-            selects.forEach(select => {
-                select.addEventListener('change', function() {
-                    if (this.classList.contains('is-invalid')) {
-                        const errorId = this.id === 'id_hospital' ? 'errorHospital' : 'errorUsuario';
+                        const errorId = this.id === 'ubicacion' ? 'errorUbicacion' : 'errorTelefono';
                         document.getElementById(errorId).textContent = '';
                         this.classList.remove('is-invalid');
                     }
