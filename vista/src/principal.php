@@ -60,6 +60,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
         </ul>
       </li>
       <li><a href="../Recetas.php">Recetas</a></li>
+      <li><a href="../Usuarios.php">Reportes</a></li>
     </ul>
   </nav>
 

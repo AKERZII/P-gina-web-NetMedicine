@@ -11,8 +11,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 // Obtener médicos de la base de datos con información de hospital
 try {
     $query = "
-
-        SELECT
+        SELECT 
             m.id_medico,
             m.especialidad,
             m.horario,
@@ -215,7 +214,7 @@ try {
             </div>
             
             <div class="buttons-group mt-3">
-                   <a href="./formulario.php" class="btn-login">
+                   <a href="./FormularioMedicos.php" class="btn-login">
                      <i class="fas fa-user-plus"></i> Agregar médico
                    </a>
                 <a href="./Hospitales.php" class="btn-login">

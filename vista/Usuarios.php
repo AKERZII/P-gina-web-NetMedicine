@@ -120,7 +120,7 @@ if (isset($_GET['busqueda']) && !empty($_GET['busqueda'])) {
         }
         
         .dashboard-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #4c7ea6;
             color: white;
             padding: 30px 0;
             margin-bottom: 30px;
@@ -179,7 +179,7 @@ if (isset($_GET['busqueda']) && !empty($_GET['busqueda'])) {
         }
         
         .search-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #4c7ea6;
             color: white;
             border: none;
             border-radius: 10px;
@@ -201,7 +201,7 @@ if (isset($_GET['busqueda']) && !empty($_GET['busqueda'])) {
         }
         
         .table thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #4c7ea6;
             color: white;
         }
         
@@ -221,7 +221,7 @@ if (isset($_GET['busqueda']) && !empty($_GET['busqueda'])) {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #a8a8a8;
             color: white;
             display: flex;
             align-items: center;
@@ -231,7 +231,7 @@ if (isset($_GET['busqueda']) && !empty($_GET['busqueda'])) {
         }
         
         .role-badge {
-            padding: 5px 15px;
+            padding: 5px 15px;SSS
             border-radius: 20px;
             font-size: 0.85rem;
             font-weight: 600;
@@ -293,7 +293,7 @@ if (isset($_GET['busqueda']) && !empty($_GET['busqueda'])) {
         }
         
         .user-details-modal .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #4c7ea6;
             color: white;
             border-radius: 15px 15px 0 0;
             border: none;
@@ -710,12 +710,6 @@ if (isset($_GET['busqueda']) && !empty($_GET['busqueda'])) {
                         <span class="text-muted me-3">
                             Mostrando <?php echo count($usuarios); ?> de <?php echo $estadisticas['total_usuarios']; ?> usuarios
                         </span>
-                        <button class="btn btn-outline-primary btn-export">
-                            <i class="fas fa-file-excel me-2"></i>Exportar a Excel
-                        </button>
-                        <button class="btn btn-outline-success btn-export">
-                            <i class="fas fa-file-pdf me-2"></i>Exportar a PDF
-                        </button>
                     </div>
                 </div>
                 
