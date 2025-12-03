@@ -11,13 +11,13 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 // Obtener médicos de la base de datos con información de hospital
 try {
     $query = "
-        SELECT 
-            m.id_medico
+        SELECT
+            m.id_medico,
             m.especialidad,
             m.horario,
             u.nombre as usuario_nombre,
             u.correo as usuario_correo
-        FROM medicos m
+        FROM medico m
         LEFT JOIN usuario u ON m.id_usuario = u.id_usuario
         WHERE m.activo=1
     ";
