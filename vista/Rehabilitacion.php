@@ -58,9 +58,6 @@
 
   <div class="container">
     <h1 class="mb-4">Rehabilitación</h1>
-    <img src="./img/rehabilitacion.jpg" alt="Sesión de rehabilitación física" class="hero-img">
-
-    <p>La <strong>rehabilitación</strong> es un conjunto de estrategias y terapias destinadas a recuperar, mantener o mejorar habilidades físicas, cognitivas y sociales tras una lesión, enfermedad o procedimiento médico. Su objetivo principal es ayudar a las personas a alcanzar el mayor nivel posible de independencia y calidad de vida.</p>
 
     <h2>Áreas comunes de la rehabilitación</h2>
     <ul>

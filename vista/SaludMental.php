@@ -58,10 +58,6 @@
 
   <div class="container">
     <h1 class="mb-4">Salud Mental</h1>
-    <img src="./img/saludmental.jpg" alt="Ilustración de salud mental" class="hero-img">
-
-    <p>La <strong>salud mental</strong> es un componente esencial del bienestar general. Se refiere al equilibrio emocional, psicológico y social que permite afrontar el estrés cotidiano, trabajar de manera productiva y contribuir a la comunidad.</p>
-
     <h2>Áreas comunes de atención</h2>
     <ul>
       <li>Psicología: apoyo en procesos emocionales, terapia individual o grupal.</li>

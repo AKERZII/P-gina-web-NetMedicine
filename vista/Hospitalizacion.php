@@ -58,9 +58,6 @@
   <!-- CONTENIDO -->
   <div class="container">
     <h1 class="mb-4">Hospitalización</h1>
-    <img src="../img/hospital.jpg" alt="Área de hospitalización" class="hero-img">
-
-    <p>La <strong>hospitalización</strong> es el proceso mediante el cual un paciente permanece en un hospital para recibir atención médica continua. Puede ser necesaria por diversos motivos, como cirugías, tratamientos especializados o vigilancia médica prolongada.</p>
 
     <h2>Aspectos generales</h2>
     <p>En la mayoría de los hospitales, la hospitalización incluye:</p>

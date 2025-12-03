@@ -57,10 +57,6 @@
   </nav>
   <div class="container">
     <h1 class="mb-4">Urgencias</h1>
-    <img src="./img/urgencias.jpg" alt="Área de urgencias hospitalarias" class="hero-img">
-
-    <p>La <strong>atención de urgencias</strong> se refiere a la asistencia médica inmediata que se brinda a personas con condiciones que ponen en riesgo su vida o requieren intervención rápida. Es un componente esencial de cualquier sistema de salud.</p>
-
     <h2>Situaciones comunes de urgencia</h2>
     <ul>
       <li>Accidentes y traumatismos graves.</li>

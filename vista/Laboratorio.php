@@ -73,11 +73,6 @@
         </ul>
       </div>
       <div class="col-md-6">
-        <h3>Horarios de Atención</h3>
-        <p><strong>Lunes a Viernes:</strong> 7:00 - 20:00 hrs</p>
-        <p><strong>Sábados:</strong> 8:00 - 14:00 hrs</p>
-        <p><strong>Domingos:</strong> Cerrado</p>
-        
         <h3>Preparación para Estudios</h3>
         <p>Para la mayoría de los estudios se requiere ayuno de 8-12 horas. Consulte con su médico las indicaciones específicas.</p>
       </div>

@@ -59,10 +59,6 @@
   <!-- CONTENIDO -->
   <div class="container">
     <h1 class="mb-4"></h1>
-    <img src="./img/Planificacion.png" alt="Ilustración de planificación familiar" class="hero-img">
-
-    <p>La <strong>planificación familiar</strong> es el conjunto de prácticas y decisiones que permiten a las personas y parejas decidir de manera responsable sobre el número de hijos que desean tener y el intervalo entre cada nacimiento. Es un aspecto fundamental de la salud reproductiva y del bienestar social.</p>
-
     <h2>Aspectos generales</h2>
     <ul>
       <li>Orientación sobre métodos anticonceptivos.</li>

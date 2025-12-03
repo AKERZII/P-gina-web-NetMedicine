@@ -68,9 +68,9 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
   <section class="hero">
     <div class="slider">
       <div class="slides">
-        <img src="../img/images.jpg" alt="Hospital moderno" loading="lazy">
-        <img src="../img/post_WhatsApp_Image_2023-03-12_at_10.06.19_AM__1_.jpeg" alt="Atención médica" loading="lazy">
-        <img src="../img/0_Fachada-HAMexico.jpg" alt="Instalaciones médicas" loading="lazy">
+        <img src="../img/HospitalNocturno.png" alt="Hospital moderno" loading="lazy">
+        <img src="../img/HospitalDia.png" alt="Atención médica" loading="lazy">
+        <img src="../img/Hospital2.png" alt="Instalaciones médicas" loading="lazy">
       </div>
       <h1 class="titulo-hero">Red Médica</h1>
     </div>
